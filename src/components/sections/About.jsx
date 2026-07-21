@@ -1,9 +1,5 @@
 import { forwardRef } from 'react'
-import JourneyCard from '../ui/JourneyCard'
-import { JOURNEY_ENTRIES } from '../../lib/constants'
 
-// About section — absolutely-positioned full-screen layer stacked behind
-// Hero, slides up into view via the GSAP timeline in HeroToAbout.
 const About = forwardRef(function About(_, ref) {
   return (
     <section
@@ -29,7 +25,16 @@ const About = forwardRef(function About(_, ref) {
         that is easier to show than explain.
       </p>
 
-      <JourneyCard entries={JOURNEY_ENTRIES} position="bottom-16 right-10" />
+      {/* FIX: vertically centered relative to the text block (top-1/2 + translate)
+          instead of pinned to bottom-16 — gives consistent, balanced gap from
+          the heading regardless of screen height */}
+      <div className="absolute right-10 top-1/2 hidden w-72 -translate-y-1/2 rounded-2xl bg-panel/70 p-6 shadow-xl backdrop-blur-md lg:block">
+        <p className="font-display text-5xl font-black leading-none text-accent">'24</p>
+        <h3 className="mt-4 text-lg font-bold text-ink">Where it started</h3>
+        <p className="mt-2 text-sm leading-relaxed text-ink/70">
+          Wrote my first "Hello World" and got hooked immediately. Been building ever since.
+        </p>
+      </div>
     </section>
   )
 })
