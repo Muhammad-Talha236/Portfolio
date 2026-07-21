@@ -1,0 +1,45 @@
+@import "tailwindcss";
+
+/* ============================================
+   DESIGN TOKENS — extracted from reference site
+   These become usable as Tailwind classes automatically,
+   e.g. bg-background, text-accent, font-display
+   ============================================ */
+@theme {
+  /* Colors */
+  --color-background: #ddd8cb;   /* warm beige/khaki page bg */
+  --color-panel: #e8e4d8;        /* glass card / sidebar bg */
+  --color-accent: #f0ff3d;       /* electric yellow */
+  --color-ink: #1a1a1a;          /* near-black text */
+  --color-cream: #f7f5ee;        /* off-white text on dark overlay */
+
+  /* Fonts */
+  --font-display: "Inter Tight", sans-serif;
+  --font-body: "Inter", sans-serif;
+}
+
+/* Base resets */
+* {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  background-color: var(--color-background);
+  color: var(--color-ink);
+  font-family: var(--font-body);
+  overflow-x: hidden; /* prevents horizontal scroll from big oversized headline text */
+}
+
+/* Respect users who prefer less motion (accessibility) */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
