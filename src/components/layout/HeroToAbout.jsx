@@ -1,5 +1,5 @@
-import { useRef, useLayoutEffect } from 'react'
-import { Home, CircleUser, Layers, Briefcase, Zap, Mail, ArrowUpRight, Lightbulb, ShieldCheck, Target, Users } from 'lucide-react'
+import { useRef, useLayoutEffect, useState } from 'react'
+import { Home, CircleUser, Briefcase, Zap, Mail, ArrowUpRight, Lightbulb, ShieldCheck, Target, Users } from 'lucide-react'
 import gsap from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
 import About from '../sections/About'
@@ -22,8 +22,14 @@ const TRAITS = [
   { icon: Zap, label: 'Fast Learner' },
 ]
 
+const SKILLS = ['React', 'JavaScript', 'Node.js', 'Tailwind CSS', 'GSAP']
+
 function HeroToAbout() {
   const sectionRef = useRef(null)
+  const scrollTriggerRef = useRef(null)
+  const sceneTimelineRef = useRef(null)
+  const activeSectionRef = useRef('home')
+  const [activeSection, setActiveSection] = useState('home')
 
   const bgNameRef = useRef(null)
   const navLogoRef = useRef(null)
@@ -44,6 +50,26 @@ function HeroToAbout() {
   const sidebarCtaRef = useRef(null)
 
   const aboutRef = useRef(null)
+
+  // This is a pinned scroll scene, not two normal document sections. Using a
+  // direct scroll target guarantees that Home reverses every tween back to 0.
+  const handleNavigation = (event, id) => {
+    if (id !== 'home' && id !== 'about') return
+
+    event.preventDefault()
+    const trigger = scrollTriggerRef.current
+    const sceneTop = trigger?.start ?? sectionRef.current?.offsetTop
+    if (sceneTop == null) return
+
+    const target = id === 'home'
+      ? sceneTop
+      : trigger?.end ?? sceneTop + window.innerHeight * 1.65
+
+    // Avoid showing a half-scrubbed Home frame while smooth scroll settles.
+    if (id === 'home') sceneTimelineRef.current?.progress(0)
+    window.history.replaceState(null, '', `#${id}`)
+    window.scrollTo({ top: target, behavior: 'smooth' })
+  }
 
   useLayoutEffect(() => {
     const ctx = gsap.context(() => {
@@ -96,8 +122,17 @@ function HeroToAbout() {
           scrub: 1,
           pin: true,
           anticipatePin: 1,
+          onUpdate: (self) => {
+            const nextSection = self.progress >= 0.72 ? 'about' : 'home'
+            if (activeSectionRef.current !== nextSection) {
+              activeSectionRef.current = nextSection
+              setActiveSection(nextSection)
+            }
+          },
         },
       })
+      scrollTriggerRef.current = tl.scrollTrigger
+      sceneTimelineRef.current = tl
 
       // Giant name → sidebar logo: travels 0→0.55, crossfades to real logo 0.55→0.68
       tl.to(bgNameRef.current, { x: nameDelta.x, y: nameDelta.y, scale: nameDelta.scale, duration: 0.55, ease: 'none' }, 0)
@@ -132,11 +167,11 @@ function HeroToAbout() {
 
       // Trait/description cards: no sidebar home, drift up & fully gone by 0.4
       tl.to([traitsCardRef.current, descCardRef.current, introTextRef.current], {
-        y: -60, opacity: 0, duration: 0.3, ease: 'none',
-      }, 0.1)
+        y: -60, opacity: 0, duration: 0.22, ease: 'none',
+      }, 0.35)
 
       // Heading + tagline dissolve 0.15→0.4
-      tl.to(headingRef.current, { y: -40, scale: 0.92, opacity: 0, duration: 0.25, ease: 'none' }, 0.15)
+      tl.to(headingRef.current, { y: -40, scale: 0.92, opacity: 0, duration: 0.2, ease: 'none' }, 0.45)
 
       // Resume button: travel 0.25→0.65, crossfade to sidebar CTA 0.65→0.75
       tl.to(resumeBtnRef.current, { x: ctaDelta.x, y: ctaDelta.y, scale: ctaDelta.scale, duration: 0.4, ease: 'none' }, 0.25)
@@ -144,7 +179,7 @@ function HeroToAbout() {
       tl.to(sidebarCtaRef.current, { opacity: 1, duration: 0.1, ease: 'none' }, 0.65)
       gsap.set(sidebarCtaRef.current, { opacity: 0 })
 
-      tl.to(ctaBtnsRef.current, { opacity: 0, y: 40, duration: 0.2, ease: 'none' }, 0.2)
+      tl.to(ctaBtnsRef.current, { opacity: 0, y: 40, duration: 0.2, ease: 'none' }, 0.42)
 
       // Sidebar backdrop + tagline fade in gradually as content arrives
       tl.to(sidebarRef.current, { opacity: 1, duration: 0.3, ease: 'none' }, 0.4)
@@ -159,7 +194,7 @@ function HeroToAbout() {
   }, [])
 
   return (
-    <div ref={sectionRef} className="relative h-screen overflow-hidden bg-background">
+    <div id="home" ref={sectionRef} className="relative h-screen overflow-hidden bg-background">
       {/* ============ HERO LAYER ============ */}
       <section className="absolute inset-0 z-20 flex flex-col items-center justify-center overflow-hidden pt-20">
         <header className="fixed inset-x-0 top-0 z-40 flex items-center justify-between px-6 py-6 md:px-10">
@@ -170,13 +205,31 @@ function HeroToAbout() {
             <span className="font-display text-sm font-bold text-ink">TALHA</span>
           </div>
 
-          <nav className="hidden gap-7 md:flex">
+          <nav className="hidden items-center gap-10 md:flex">
             {NAV_ITEMS.map((item, i) => (
               <a
                 key={item.id}
                 ref={(el) => (navLinkRefs.current[i] = el)}
                 href={`#${item.id}`}
-                className="text-sm font-semibold text-ink/80"
+                onClick={(event) => handleNavigation(event, item.id)}
+                className="relative
+                text-[13px]
+                font-medium
+                text-neutral-700
+                transition-all
+                duration-300
+                hover:text-black
+
+                after:absolute
+                after:left-0
+                after:-bottom-2
+                after:h-[2px]
+                after:w-0
+                after:bg-[#FFD900]
+                after:transition-all
+                after:duration-300
+
+                hover:after:w-full"
               >
                 {item.label}
               </a>
@@ -189,7 +242,19 @@ function HeroToAbout() {
             href="/resume.pdf"
             target="_blank"
             rel="noreferrer"
-            className="flex items-center gap-1 rounded-full bg-accent px-4 py-2 text-sm font-bold text-ink shadow-md"
+            className=" flex
+            items-center
+            gap-1.5
+            rounded-full
+            bg-[#f0ff3d]
+            px-5
+            h-10
+            text-[13px]
+            font-semibold
+            text-black
+            transition-all
+            duration-300
+            hover:scale-105"
           >
             Resume <ArrowUpRight size={14} strokeWidth={3} />
           </a>
@@ -281,40 +346,53 @@ function HeroToAbout() {
       {/* ============ SIDEBAR LAYER (final morph target) ============ */}
       <aside
         ref={sidebarRef}
-        className="fixed left-0 top-0 z-50 flex h-screen w-64 flex-col justify-between overflow-y-auto p-6"
+        className="fixed left-0 top-0 z-50 flex h-[100svh] w-60 flex-col justify-between overflow-hidden p-4"
       >
         <div>
-          <div ref={sidebarLogoRef} className="w-fit rounded-md bg-accent px-3 py-1 font-display text-xl font-black text-ink">
+          <div className="rounded-lg border border-white/35 bg-panel/80 p-3 shadow-sm backdrop-blur-sm">
+            <div className="flex items-center justify-between">
+              <div ref={sidebarLogoRef} className="w-fit rounded-md bg-accent px-2 py-1 font-display text-sm font-black tracking-tight text-ink">
             TALHA<span className="align-super text-xs">®</span>
-          </div>
+              </div>
+              <div className="flex gap-2">
+                <a aria-label="GitHub" href="https://github.com" className="rounded-lg bg-cream/70 px-2 py-1.5 text-ink transition-colors hover:bg-accent">
+                  <span className="text-xs font-black">GH</span>
+                </a>
+                <a aria-label="LinkedIn" href="https://linkedin.com" className="rounded-lg bg-cream/70 px-2 py-1.5 text-ink transition-colors hover:bg-accent">
+                  <span className="text-xs font-black">in</span>
+                </a>
+              </div>
+            </div>
 
-          {/* NEW: short tagline under the logo, matching reference layout */}
-          <p ref={sidebarTaglineRef} className="mt-4 text-xs leading-relaxed text-ink/60">
+            <p ref={sidebarTaglineRef} className="mt-6 text-xs leading-relaxed text-ink/80">
             Building thoughtful, production-quality software — one project at a time.
-          </p>
+            </p>
+          </div>
 
-          <div className="mt-6 flex gap-3">
-            <div ref={(el) => (sidebarStatRefs.current[0] = el)} className="flex-1 rounded-xl bg-panel/70 p-3 text-center backdrop-blur-sm">
-              <p className="font-display text-2xl font-black text-accent">10+</p>
-              <p className="text-xs font-medium text-ink/70">Projects</p>
+          <div className="mt-3 flex rounded-lg border border-white/35 bg-panel/80 px-2 py-3 shadow-sm backdrop-blur-sm">
+            <div ref={(el) => (sidebarStatRefs.current[0] = el)} className="flex flex-1 flex-col items-center border-r border-ink/15 text-center">
+              <p className="font-display text-2xl font-black leading-none text-accent">10+</p>
+              <p className="mt-1 text-[11px] font-bold leading-tight text-ink">Projects</p>
             </div>
-            <div ref={(el) => (sidebarStatRefs.current[1] = el)} className="flex-1 rounded-xl bg-panel/70 p-3 text-center backdrop-blur-sm">
-              <p className="font-display text-2xl font-black text-accent">2+</p>
-              <p className="text-xs font-medium text-ink/70">Years</p>
+            <div ref={(el) => (sidebarStatRefs.current[1] = el)} className="flex flex-1 flex-col items-center text-center">
+              <p className="font-display text-2xl font-black leading-none text-accent">2+</p>
+              <p className="mt-1 max-w-16 text-[11px] font-bold leading-tight text-ink">Years of experience</p>
             </div>
           </div>
 
-          <nav className="mt-6 flex flex-col gap-1 rounded-xl bg-panel/70 p-2 backdrop-blur-sm">
+          <nav className="mt-3 flex flex-col items-start gap-1.5 rounded-lg border border-white/35 bg-panel/80 p-3 shadow-sm backdrop-blur-sm">
             {NAV_ITEMS.map((item, i) => {
               const Icon = item.icon
+              const isActive = activeSection === item.id
               return (
                 <a
                   key={item.id}
                   ref={(el) => (sidebarLinkRefs.current[i] = el)}
                   href={`#${item.id}`}
-                  className="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-semibold text-ink/80 transition-colors hover:bg-accent hover:text-ink"
+                  onClick={(event) => handleNavigation(event, item.id)}
+                  className={`flex items-center gap-2 rounded-lg px-2 py-1 font-display text-xs font-black uppercase tracking-tight text-ink transition-colors hover:bg-accent ${isActive ? 'bg-accent' : 'bg-cream/65'}`}
                 >
-                  <Icon size={16} strokeWidth={2.5} />
+                  <Icon size={14} strokeWidth={2.75} />
                   {item.label}
                 </a>
               )
@@ -322,9 +400,24 @@ function HeroToAbout() {
           </nav>
         </div>
 
-        <a ref={sidebarCtaRef} href="#contact" className="rounded-xl bg-accent px-4 py-3 text-center font-display font-bold text-ink">
-          Let's Talk
-        </a>
+        <div className="flex flex-col gap-2">
+          <div className="overflow-hidden rounded-lg border border-white/35 bg-panel/80 py-2 shadow-sm backdrop-blur-sm">
+            <div className="sidebar-skill-track flex w-max items-center gap-2 px-2">
+              {[...SKILLS, ...SKILLS].map((skill, index) => (
+                <span key={`${skill}-${index}`} className="rounded-md bg-cream/75 px-2 py-1 text-[10px] font-bold text-ink whitespace-nowrap">
+                  {skill}
+                </span>
+              ))}
+            </div>
+          </div>
+          <a href="mailto:talha@example.com" className="flex items-center justify-between rounded-lg border border-white/35 bg-panel/80 px-3 py-2 text-xs text-ink/80 shadow-sm backdrop-blur-sm">
+            talha@example.com
+            <Mail size={15} strokeWidth={2.5} />
+          </a>
+          <a ref={sidebarCtaRef} href="#contact" className="rounded-xl bg-accent px-4 py-2.5 text-center font-display text-base font-black text-ink transition-transform hover:scale-[1.02]">
+            Let's Talk
+          </a>
+        </div>
       </aside>
 
       {/* ============ ABOUT LAYER ============ */}

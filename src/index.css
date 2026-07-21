@@ -34,6 +34,17 @@ body {
   overflow-x: hidden; /* prevents horizontal scroll from big oversized headline text */
 }
 
+/* Compact, continuously moving skills strip used above the sidebar email card. */
+@keyframes sidebar-skill-marquee {
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+.sidebar-skill-track {
+  animation: sidebar-skill-marquee 15s linear infinite;
+}
+
 /* Respect users who prefer less motion (accessibility) */
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after {
