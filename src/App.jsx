@@ -1,14 +1,12 @@
-import Navbar from './components/layout/Navbar'
-import Hero from './components/sections/Hero'
+import { useLenis } from './hooks/useLenis'
+import HeroToAbout from './components/layout/HeroToAbout'
 
 function App() {
+  useLenis()
+
   return (
     <div className="bg-background font-body text-ink">
-      <Navbar />
-      <main>
-        <Hero />
-        {/* Next: About section */}
-      </main>
+      <HeroToAbout />
     </div>
   )
 }
