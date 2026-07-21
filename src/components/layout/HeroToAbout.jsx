@@ -1,4 +1,5 @@
 import { useRef, useLayoutEffect, useState } from 'react'
+import { createPortal } from 'react-dom'
 import { Home, CircleUser, Briefcase, Zap, Mail, ArrowUpRight, Lightbulb, ShieldCheck, Target, Users } from 'lucide-react'
 import gsap from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
@@ -9,6 +10,7 @@ gsap.registerPlugin(ScrollTrigger)
 const NAV_ITEMS = [
   { id: 'home', label: 'Home', icon: Home },
   { id: 'about', label: 'About Me', icon: CircleUser },
+  { id: 'skills', label: 'Skills', icon: Target },
   { id: 'projects', label: 'Projects', icon: Briefcase },
   { id: 'experience', label: 'Experience', icon: Zap },
   { id: 'contact', label: 'Contact', icon: Mail },
@@ -65,8 +67,28 @@ function HeroToAbout() {
       ? sceneTop
       : trigger?.end ?? sceneTop + window.innerHeight * 1.65
 
-    // Avoid showing a half-scrubbed Home frame while smooth scroll settles.
-    if (id === 'home') sceneTimelineRef.current?.progress(0)
+    // Reset every animated layer before scrolling back. A timeline progress
+    // reset alone can leave the intro tween's inline opacity in a stale state.
+    if (id === 'home') {
+      sceneTimelineRef.current?.progress(0)
+      gsap.set(
+        [
+          bgNameRef.current,
+          navLogoRef.current,
+          headingRef.current,
+          ctaBtnsRef.current,
+          resumeBtnRef.current,
+          introTextRef.current,
+          traitsCardRef.current,
+          descCardRef.current,
+          ...statCardRefs.current,
+        ],
+        { x: 0, y: 0, scale: 1, opacity: 1 }
+      )
+      gsap.set(aboutRef.current, { yPercent: 100 })
+      gsap.set(sidebarRef.current, { opacity: 0 })
+      requestAnimationFrame(() => ScrollTrigger.update())
+    }
     window.history.replaceState(null, '', `#${id}`)
     window.scrollTo({ top: target, behavior: 'smooth' })
   }
@@ -344,6 +366,7 @@ function HeroToAbout() {
       </section>
 
       {/* ============ SIDEBAR LAYER (final morph target) ============ */}
+      {createPortal(
       <aside
         ref={sidebarRef}
         className="fixed left-0 top-0 z-50 flex h-[100svh] w-60 flex-col justify-between overflow-hidden p-4"
@@ -418,7 +441,9 @@ function HeroToAbout() {
             Let's Talk
           </a>
         </div>
-      </aside>
+      </aside>,
+      document.body
+      )}
 
       {/* ============ ABOUT LAYER ============ */}
       <About ref={aboutRef} />

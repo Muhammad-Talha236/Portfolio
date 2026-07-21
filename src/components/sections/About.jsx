@@ -1,7 +1,9 @@
 import { forwardRef } from 'react'
+import JourneyTimeline from './JourneyTimeline'
 
 const About = forwardRef(function About(_, ref) {
   return (
+    <>
     <section
       id="about"
       ref={ref}
@@ -13,14 +15,14 @@ const About = forwardRef(function About(_, ref) {
 
       <h2
         className="font-display font-black leading-[1.05] text-ink"
-        style={{ fontSize: 'clamp(36px, 5.5vw, 72px)' }}
+        style={{ fontSize: 'clamp(24px, 5.5vw, 50px)' }}
       >
         About Me (&)
-        <br />
-        My Journey
+        <br></br>
+My Journey
       </h2>
 
-      <p className="mt-6 max-w-md text-base text-ink/70 md:text-lg">
+      <p className="mt-4 max-w-md text-base text-ink/70 md:text-1xl">
         Two years ago I opened VS Code for the first time. What happened after
         that is easier to show than explain.
       </p>
@@ -28,14 +30,10 @@ const About = forwardRef(function About(_, ref) {
       {/* FIX: vertically centered relative to the text block (top-1/2 + translate)
           instead of pinned to bottom-16 — gives consistent, balanced gap from
           the heading regardless of screen height */}
-      <div className="absolute right-10 top-1/2 hidden w-72 -translate-y-1/2 rounded-2xl bg-panel/70 p-6 shadow-xl backdrop-blur-md lg:block">
-        <p className="font-display text-5xl font-black leading-none text-accent">'24</p>
-        <h3 className="mt-4 text-lg font-bold text-ink">Where it started</h3>
-        <p className="mt-2 text-sm leading-relaxed text-ink/70">
-          Wrote my first "Hello World" and got hooked immediately. Been building ever since.
-        </p>
-      </div>
+      
     </section>
+    <JourneyTimeline />
+    </>
   )
 })
 
