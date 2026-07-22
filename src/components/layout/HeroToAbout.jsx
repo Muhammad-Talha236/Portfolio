@@ -363,86 +363,97 @@ useLayoutEffect(() => {
         </p>
       </section>
 
-      {/* ============ SIDEBAR LAYER (final morph target) ============ */}
+    {/* ============ SIDEBAR LAYER (final morph target) ============ */}
       {createPortal(
-      <aside
-        ref={sidebarRef}
-        className="fixed left-0 top-0 z-50 flex h-[100svh] w-60 flex-col justify-between overflow-hidden p-4"
-      >
-        <div>
-          <div className="rounded-lg border border-white/35 bg-panel/80 p-3 shadow-sm backdrop-blur-sm">
-            <div className="flex items-center justify-between">
-              <div ref={sidebarLogoRef} className="w-fit rounded-md bg-accent px-2 py-1 font-display text-sm font-black tracking-tight text-ink">
-            TALHA<span className="align-super text-xs">®</span>
+        <aside
+          ref={sidebarRef}
+          className="fixed left-0 top-0 z-50 flex h-[100svh] w-56 flex-col justify-between overflow-y-auto overflow-x-hidden p-4 pb-6 custom-scrollbar"
+        >
+          {/* Top Section */}
+          <div className="flex flex-col gap-2">
+            
+            {/* Logo & Tagline */}
+            <div className="rounded-xl border border-white/35 bg-panel/80 p-3 shadow-sm backdrop-blur-sm">
+              <div className="flex items-center justify-between">
+                <div ref={sidebarLogoRef} className="w-fit rounded-md bg-accent px-2 py-1 font-display text-sm font-black tracking-tight text-ink">
+                  TALHA<span className="align-super text-[10px]">®</span>
+                </div>
+                <div className="flex gap-1.5">
+                  <a aria-label="GitHub" href="https://github.com" className="rounded-md bg-cream/70 px-1.5 py-1 text-ink transition-colors hover:bg-accent">
+                    <span className="text-[10px] font-black">GH</span>
+                  </a>
+                  <a aria-label="LinkedIn" href="https://linkedin.com" className="rounded-md bg-cream/70 px-1.5 py-1 text-ink transition-colors hover:bg-accent">
+                    <span className="text-[10px] font-black">in</span>
+                  </a>
+                </div>
               </div>
-              <div className="flex gap-2">
-                <a aria-label="GitHub" href="https://github.com" className="rounded-lg bg-cream/70 px-2 py-1.5 text-ink transition-colors hover:bg-accent">
-                  <span className="text-xs font-black">GH</span>
-                </a>
-                <a aria-label="LinkedIn" href="https://linkedin.com" className="rounded-lg bg-cream/70 px-2 py-1.5 text-ink transition-colors hover:bg-accent">
-                  <span className="text-xs font-black">in</span>
-                </a>
+              <p ref={sidebarTaglineRef} className="mt-3 text-[11px] leading-relaxed text-ink/80">
+                Building thoughtful, production-quality software — one project at a time.
+              </p>
+            </div>
+
+            {/* Stats */}
+            <div className="flex rounded-xl border border-white/35 bg-panel/80 px-2 py-2 shadow-sm backdrop-blur-sm">
+              <div ref={(el) => (sidebarStatRefs.current[0] = el)} className="flex flex-1 flex-col items-center border-r border-ink/15 text-center">
+                <p className="font-display text-xl font-black leading-none text-accent">10+</p>
+                <p className="mt-1 text-[10px] font-bold leading-tight text-ink">Projects</p>
+              </div>
+              <div ref={(el) => (sidebarStatRefs.current[1] = el)} className="flex flex-1 flex-col items-center text-center">
+                <p className="font-display text-xl font-black leading-none text-accent">2+</p>
+                <p className="mt-1 max-w-[4rem] text-[10px] font-bold leading-tight text-ink">Years of experience</p>
               </div>
             </div>
 
-            <p ref={sidebarTaglineRef} className="mt-6 text-xs leading-relaxed text-ink/80">
-            Building thoughtful, production-quality software — one project at a time.
-            </p>
+            {/* Navigation */}
+            <nav className="flex flex-col items-start gap-1 rounded-xl border border-white/35 bg-panel/80 p-2 shadow-sm backdrop-blur-sm">
+              {NAV_ITEMS.map((item, i) => {
+                const Icon = item.icon
+                const isActive = activeSection === item.id
+                return (
+                  <a
+                    key={item.id}
+                    ref={(el) => (sidebarLinkRefs.current[i] = el)}
+                    href={`#${item.id}`}
+                    onClick={(event) => handleNavigation(event, item.id)}
+                    className={`flex w-full items-center gap-2 rounded-lg px-2 py-1.5 font-display text-[11px] font-black uppercase tracking-tight text-ink transition-colors hover:bg-accent ${isActive ? 'bg-accent' : 'bg-cream/65'}`}
+                  >
+                    <Icon size={14} strokeWidth={2.75} />
+                    {item.label}
+                  </a>
+                )
+              })}
+            </nav>
           </div>
 
-          <div className="mt-3 flex rounded-lg border border-white/35 bg-panel/80 px-2 py-3 shadow-sm backdrop-blur-sm">
-            <div ref={(el) => (sidebarStatRefs.current[0] = el)} className="flex flex-1 flex-col items-center border-r border-ink/15 text-center">
-              <p className="font-display text-2xl font-black leading-none text-accent">10+</p>
-              <p className="mt-1 text-[11px] font-bold leading-tight text-ink">Projects</p>
+          {/* Bottom Section */}
+          <div className="mt-4 flex flex-col gap-2">
+            
+            {/* Skills Marquee */}
+            <div className="overflow-hidden rounded-xl border border-white/35 bg-panel/80 py-1.5 shadow-sm backdrop-blur-sm">
+              <div className="sidebar-skill-track flex w-max items-center gap-1.5 px-2">
+                {[...SKILLS, ...SKILLS].map((skill, index) => (
+                  <span key={`${skill}-${index}`} className="rounded-md bg-cream/75 px-1.5 py-1 text-[10px] font-bold text-ink whitespace-nowrap">
+                    {skill}
+                  </span>
+                ))}
+              </div>
             </div>
-            <div ref={(el) => (sidebarStatRefs.current[1] = el)} className="flex flex-1 flex-col items-center text-center">
-              <p className="font-display text-2xl font-black leading-none text-accent">2+</p>
-              <p className="mt-1 max-w-16 text-[11px] font-bold leading-tight text-ink">Years of experience</p>
-            </div>
-          </div>
 
-          <nav className="mt-3 flex flex-col items-start gap-1.5 rounded-lg border border-white/35 bg-panel/80 p-3 shadow-sm backdrop-blur-sm">
-            {NAV_ITEMS.map((item, i) => {
-              const Icon = item.icon
-              const isActive = activeSection === item.id
-              return (
-                <a
-                  key={item.id}
-                  ref={(el) => (sidebarLinkRefs.current[i] = el)}
-                  href={`#${item.id}`}
-                  onClick={(event) => handleNavigation(event, item.id)}
-                  className={`flex items-center gap-2 rounded-lg px-2 py-1 font-display text-xs font-black uppercase tracking-tight text-ink transition-colors hover:bg-accent ${isActive ? 'bg-accent' : 'bg-cream/65'}`}
-                >
-                  <Icon size={14} strokeWidth={2.75} />
-                  {item.label}
-                </a>
-              )
-            })}
-          </nav>
-        </div>
+            {/* Email Contact */}
+            <a href="mailto:talha@example.com" className="flex items-center justify-between rounded-xl border border-white/35 bg-panel/80 px-3 py-2 text-[11px] text-ink/80 shadow-sm backdrop-blur-sm">
+              talha@example.com
+              <Mail size={14} strokeWidth={2.5} />
+            </a>
 
-        <div className="flex flex-col gap-2">
-          <div className="overflow-hidden rounded-lg border border-white/35 bg-panel/80 py-2 shadow-sm backdrop-blur-sm">
-            <div className="sidebar-skill-track flex w-max items-center gap-2 px-2">
-              {[...SKILLS, ...SKILLS].map((skill, index) => (
-                <span key={`${skill}-${index}`} className="rounded-md bg-cream/75 px-2 py-1 text-[10px] font-bold text-ink whitespace-nowrap">
-                  {skill}
-                </span>
-              ))}
-            </div>
+            {/* CTA */}
+            <a ref={sidebarCtaRef} href="#contact" className="rounded-xl bg-accent px-4 py-2 text-center font-display text-sm font-black text-ink transition-transform hover:scale-[1.02]">
+              Let's Talk
+            </a>
           </div>
-          <a href="mailto:talha@example.com" className="flex items-center justify-between rounded-lg border border-white/35 bg-panel/80 px-3 py-2 text-xs text-ink/80 shadow-sm backdrop-blur-sm">
-            talha@example.com
-            <Mail size={15} strokeWidth={2.5} />
-          </a>
-          <a ref={sidebarCtaRef} href="#contact" className="rounded-xl bg-accent px-4 py-2.5 text-center font-display text-base font-black text-ink transition-transform hover:scale-[1.02]">
-            Let's Talk
-          </a>
-        </div>
-      </aside>,
-      document.body
+        </aside>,
+        document.body
       )}
-
+      
       {/* ============ ABOUT LAYER ============ */}
       <About ref={aboutRef} />
     </div>
