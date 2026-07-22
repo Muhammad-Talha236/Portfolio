@@ -6,7 +6,6 @@ import { ScrollTrigger } from 'gsap/ScrollTrigger'
 
 gsap.registerPlugin(ScrollTrigger)
 
-// Replace these temporary mp4 URLs with your own project walkthroughs when ready.
 const PROJECTS = [
   {
     number: '01',
@@ -93,31 +92,30 @@ function DevicePreview({ project }) {
     </div>
   )
 }
+
 function ProjectCard({ project, index, cardRefs }) {
   return (
     <article
       ref={(element) => {
         cardRefs.current[index] = element
       }}
-className={`project-card project-card--${project.tone} group relative flex h-[600px] min-h-[600px] w-[min(80vw,600px)] shrink-0 flex-col overflow-hidden rounded-[1.35rem] border border-white/10 p-5 md:p-6 lg:h-[550px] lg:min-h-0 lg:max-h-none`}
-
+      // WIDTH aur HEIGHT adjust kardi gayi hain taake content bahar na jaye
+      className={`project-card project-card--${project.tone} group relative flex h-[580px] w-[min(85vw,420px)] shrink-0 flex-col overflow-hidden rounded-[1.5rem] border border-white/10 p-5 md:p-6`}
     >
       {/* Background Image */}
       <div
         className="absolute inset-0 bg-cover bg-center"
         style={{ backgroundImage: `url(${project.poster})` }}
       />
-
       {/* Dark Overlay */}
       <div className="absolute inset-0 bg-black/45" />
-      <div className="absolute inset-0 bg-gradient-to-b from-black/20 via-black/20 to-black/90" />
+      <div className="absolute inset-0 bg-gradient-to-b from-black/20 via-black/20 to-black/95" />
 
       {/* Top Content */}
       <div className="relative z-10 flex items-start justify-between gap-3">
         <span className="rounded-full border border-white/35 bg-black/70 px-3 py-1.5 text-sm font-medium text-white">
           {project.number}
         </span>
-
         <div className="flex max-w-[72%] flex-wrap justify-end gap-1.5">
           {project.tags.map((tag) => (
             <span
@@ -136,17 +134,15 @@ className={`project-card project-card--${project.tone} group relative flex h-[60
       </div>
 
       {/* Bottom Content */}
-      <div className="relative z-10 mt-auto flex items-end justify-between gap-6">
+      <div className="relative z-10 mt-auto flex items-end justify-between gap-4">
         <div className="min-w-0 flex-1">
           <h3 className="font-display text-3xl font-black leading-tight tracking-tight text-white md:text-4xl">
             {project.title}
           </h3>
-
-          <p className="mt-2 max-w-[30rem] text-sm leading-relaxed text-white/80 md:text-base">
+          <p className="mt-2 text-sm leading-relaxed text-white/80 line-clamp-3 md:text-base">
             {project.description}
           </p>
         </div>
-
         {/* GitHub Button */}
         <a
           href={project.github}
@@ -174,22 +170,27 @@ function ProjectsShowcase() {
     if (!mounted) return undefined
 
     const media = gsap.matchMedia()
+
     const ctx = gsap.context(() => {
       media.add('(min-width: 1024px)', () => {
         const rail = railRef.current
-        const scrollDistance = () => Math.max(0, rail.scrollWidth - window.innerWidth + 64)
+        const scrollDistance = () => Math.max(0, rail.scrollWidth - window.innerWidth)
 
-        gsap.to(rail, {
+       gsap.to(rail, {
           x: () => -scrollDistance(),
           ease: 'none',
           scrollTrigger: {
-            // The card rail is already laid out to fit under the heading, so
-            // pinning at the section edge keeps horizontal scrolling reliable.
-            trigger: sectionRef.current,
-            start: 'top -200px',
+            // FIX: Trigger sirf cards wale container ko banayen
+            trigger: railRef.current, 
+            
+            // FIX: Cards ka center jab screen ke center mein aaye tab start karo
+            start: 'center center',   
+            
+            // FIX: Pin lekin poore section ko hi rakhein
+            pin: sectionRef.current,  
+            
             end: () => `+=${scrollDistance() + window.innerHeight * 0.55}`,
             scrub: 0.8,
-            pin: true,
             invalidateOnRefresh: true,
             anticipatePin: 1,
           },
@@ -215,13 +216,17 @@ function ProjectsShowcase() {
   if (!mounted) return null
 
   return createPortal(
-<section
-  id="projects"
-  ref={sectionRef}
-  className="relative overflow-hidden bg-[#0a0a0a] py-16 text-white lg:min-h-[100svh] lg:py-8 lg:pl-60"
->   <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_42%_20%,rgba(240,255,61,0.1),transparent_26%),linear-gradient(180deg,#080808_0%,#151515_100%)]" />
-      <div className="relative flex min-h-full flex-col justify-center lg:mx-auto lg:grid lg:h-full lg:max-w-[1600px] lg:grid-rows-[180px_700px_32px] lg:py-0">
-        <header className="mx-auto flex w-full max-w-[1600px] flex-col gap-6 px-6 pb-8 md:px-10 lg:mx-0 lg:max-w-none lg:flex-row lg:items-end lg:justify-between lg:px-16 lg:pt-6 lg:pb-5">
+    <section
+      id="projects"
+      ref={sectionRef}
+      className="relative overflow-hidden bg-[#0a0a0a] py-16 text-white lg:min-h-[100svh] lg:py-0"
+    >
+      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_42%_20%,rgba(240,255,61,0.1),transparent_26%),linear-gradient(180deg,#080808_0%,#151515_100%)]" />
+
+      {/* FIX 2: lg:h-screen aur strict grid-rows hata diye gaye hain, lg:py-16 add kiya hai taake naturally flow kare */}
+      <div className="relative flex min-h-full flex-col justify-center lg:py-16">
+        
+        <header className="mx-auto flex w-full flex-col gap-6 px-6 pb-8 md:px-10 lg:mx-0 lg:max-w-none lg:flex-row lg:items-end lg:justify-between lg:pl-[280px] lg:pr-16 lg:pt-6 lg:pb-5">
           <div>
             <span className="inline-flex items-center gap-2 rounded-full border border-white/25 px-3 py-1.5 text-xs font-black uppercase tracking-[0.14em] text-white/80"><BriefcaseBusiness size={14} className="text-accent" /> Selected work</span>
             <h2 className="mt-5 max-w-3xl font-display text-5xl font-black leading-[0.9] tracking-tight md:text-6xl">Made to perform<span className="text-accent">.</span></h2>
@@ -229,13 +234,48 @@ function ProjectsShowcase() {
           <p className="max-w-sm text-base leading-relaxed text-white/62 md:text-lg">A few digital experiences built with a focus on clear thinking, visual craft, and a little motion where it matters.</p>
         </header>
 
-        <div className="min-h-0 overflow-visible lg:overflow-hidden">
-          <div ref={railRef} className="flex w-max gap-5 px-6 md:px-10 lg:h-full lg:gap-8 lg:px-16">
+        {/* mt-12 add kiya hai header aur cards ke darmiyan thora gap dene ke liye */}
+        <div className="min-h-0 overflow-visible lg:overflow-hidden mt-4 lg:mt-12">
+          <div ref={railRef} className="flex w-max items-center gap-5 px-6 md:px-10 lg:gap-8 lg:pl-[280px] lg:pr-[10vw]">
             {PROJECTS.map((project, index) => <ProjectCard key={project.title} project={project} index={index} cardRefs={cardRefs} />)}
-            <div className="flex w-48 shrink-0 items-center justify-center text-white/40"><Sparkles size={24} className="text-accent" /></div>
+          {/* =========================================
+                Final GitHub CTA Card (With Background Image)
+                ========================================= */}
+            <div className="group relative flex h-[580px] w-[min(85vw,360px)] shrink-0 flex-col items-center justify-center overflow-hidden rounded-[1.5rem] border border-white/10 p-8 text-center transition-colors hover:border-white/20">
+              
+              {/* Background Image (Is url mein aap apni image ka link daal sakte hain) */}
+              <div 
+                className="absolute inset-0 bg-cover bg-center transition-transform duration-700 group-hover:scale-110"
+                style={{ backgroundImage: `url('https://images.unsplash.com/photo-1618401471353-b98afee0b2eb?auto=format&fit=crop&w=800&q=80')` }}
+              />
+              
+              {/* Dark Overlay & Blur (Taake text easily parha ja sake) */}
+              <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" />
+
+              {/* Card Content (z-10 zaroori hai taake yeh image ke oopar rahay) */}
+              <div className="relative z-10 flex flex-col items-center">
+                <div className="mb-2 flex h-16 w-16 items-center justify-center rounded-full bg-white/10 text-accent">
+                  <GitFork size={32} strokeWidth={2.5} />
+                </div>
+                <h3 className="font-display text-2xl font-black text-white">More on GitHub</h3>
+                <p className="mt-3 text-sm leading-relaxed text-white/70">
+                  Curious to see more? Head over to my GitHub profile to explore the rest of my work, experiments, and source code.
+                </p>
+                <a
+                  href="https://github.com/muhammad-talha236" 
+                  target="_blank"
+                  rel="noreferrer"
+                  className="mt-8 inline-flex items-center gap-2 rounded-full bg-accent px-6 py-3 text-sm font-black text-ink transition-transform hover:scale-105"
+                >
+                  <GitFork size={18} strokeWidth={2.5} />
+                  <span>View All Projects</span>
+                </a>
+              </div>
+            </div>
           </div>
         </div>
-        <p className="mt-6 px-6 text-xs font-semibold uppercase tracking-[0.2em] text-white/35 md:px-10 lg:mt-5 lg:px-16">Scroll to explore <span className="ml-2 text-accent">→</span></p>
+
+        <p className="mt-6 px-6 text-xs font-semibold uppercase tracking-[0.2em] text-white/35 md:px-10 lg:mt-8 lg:pl-[280px]">Scroll to explore <span className="ml-2 text-accent"> </span></p>
       </div>
     </section>,
     document.body

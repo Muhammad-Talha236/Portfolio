@@ -1,38 +1,49 @@
 import { useEffect, useLayoutEffect, useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
-import { Braces, Code2, Database, Layers3, Sparkles, WandSparkles } from 'lucide-react'
+import { Code2, Database, WandSparkles, Sparkles, Cpu } from 'lucide-react'
 import gsap from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
 
 gsap.registerPlugin(ScrollTrigger)
 
-const SKILL_GROUPS = [
+const EXPERTISE_CARDS = [
   {
-    title: 'Interface',
+    id: '01',
+    title: 'Frontend Architecture',
+    subtitle: 'Interface & Interaction',
     icon: Code2,
-    description: 'Clear, responsive interfaces that feel considered at every breakpoint.',
-    skills: ['React', 'JavaScript', 'Tailwind CSS'],
+    desc: 'Crafting responsive, high-performance web applications with clean component lifecycles and modern UI frameworks.',
+    tags: ['React.js', 'Vite', 'Tailwind CSS', 'JavaScript'],
   },
   {
-    title: 'Logic',
+    id: '02',
+    title: 'Backend & APIs',
+    subtitle: 'Server & Logic',
     icon: Database,
-    description: 'Practical application architecture, APIs, and data flows that scale.',
-    skills: ['Node.js', 'REST APIs', 'Databases'],
+    desc: 'Building reliable server-side infrastructure, secure endpoints, and efficient database architectures.',
+    tags: ['Node.js', 'Express.js', 'REST APIs', 'SQL / Firebase'],
   },
   {
-    title: 'Motion',
+    id: '03',
+    title: 'Motion & Animations',
+    subtitle: 'Visual Dynamics',
     icon: WandSparkles,
-    description: 'Purposeful motion that guides attention without getting in the way.',
-    skills: ['GSAP', 'Framer Motion', 'Lenis'],
+    desc: 'Implementing fluid scroll physics, high-end transitions, and engaging micro-interactions.',
+    tags: ['GSAP', 'Framer Motion', 'Lenis', 'CSS 3D'],
+  },
+  {
+    id: '04',
+    title: 'Optimization & Code',
+    subtitle: 'Quality Assurance',
+    icon: Cpu,
+    desc: 'Ensuring pristine code quality, performance optimization, and robust version-controlled deployment pipelines.',
+    tags: ['Clean Code', 'Debugging', 'Git & GitHub', 'Lighthouse'],
   },
 ]
-
-const RIBBON_ITEMS = ['React', 'JavaScript', 'Node.js', 'Tailwind CSS', 'GSAP', 'Framer Motion', 'APIs']
 
 function SkillsShowcase() {
   const sectionRef = useRef(null)
   const cardRefs = useRef([])
-  const titleRef = useRef(null)
   const [mounted, setMounted] = useState(false)
 
   useEffect(() => setMounted(true), [])
@@ -41,33 +52,38 @@ function SkillsShowcase() {
     if (!mounted) return undefined
 
     const ctx = gsap.context(() => {
-      gsap.fromTo(
-        titleRef.current,
-        { autoAlpha: 0, y: 48 },
-        {
-          autoAlpha: 1,
-          y: 0,
-          duration: 0.8,
-          ease: 'power3.out',
-          scrollTrigger: { trigger: sectionRef.current, start: 'top 75%' },
-        }
-      )
+      const cards = cardRefs.current
+      if (!cards.length) return
 
-      cardRefs.current.forEach((card, index) => {
-        gsap.fromTo(
-          card,
-          { autoAlpha: 0, y: 40, rotate: index === 1 ? 0 : index === 0 ? -3 : 3 },
-          {
-            autoAlpha: 1,
-            y: 0,
-            rotate: 0,
-            duration: 0.65,
-            delay: index * 0.1,
-            ease: 'power3.out',
-            scrollTrigger: { trigger: card, start: 'top 84%', toggleActions: 'play none none reverse' },
+      cards.forEach((card, i) => {
+        const tl = gsap.timeline({
+          scrollTrigger: {
+            trigger: sectionRef.current,
+            // Har card ke liye scroll distance barha di hai taake smooth scrubbing ho
+            start: `top+=${i * 300} top`,
+            end: `top+=${(i + 1) * 300} top`,
+            scrub: true, // Direct mouse scroll control
+            invalidateOnRefresh: true,
           }
-        )
+        })
+
+        if (i === 0) {
+          // Pehla card center se start hoga aur scroll par top-left nikal jayega
+          tl.to(card, { x: -400, y: -250, opacity: 0, scale: 0.8, ease: 'none' })
+        } else {
+          // Baqi cards bottom-right se aayenge
+          tl.fromTo(card, 
+            { x: 400, y: 250, opacity: 0, scale: 0.8 }, 
+            { x: 0, y: 0, opacity: 1, scale: 1, ease: 'none' }
+          )
+
+          // Agar akhri card nahi hai, toh yeh bhi top-left nikal jayega
+          if (i < cards.length - 1) {
+            tl.to(card, { x: -400, y: -250, opacity: 0, scale: 0.8, ease: 'none' }, '+=0.1')
+          }
+        }
       })
+
     }, sectionRef)
 
     return () => ctx.revert()
@@ -76,68 +92,75 @@ function SkillsShowcase() {
   if (!mounted) return null
 
   const content = (
-    <section id="skills" ref={sectionRef} className="relative overflow-hidden bg-ink py-24 text-cream lg:pl-72">
-      <div className="pointer-events-none absolute -right-24 top-12 h-96 w-96 rounded-full bg-accent/15 blur-3xl" />
-      <div className="pointer-events-none absolute -bottom-32 left-[35%] h-80 w-80 rounded-full bg-accent/10 blur-3xl" />
+    <section 
+      id="skills" 
+      ref={sectionRef} 
+      // Section ki length ko cards ke hisaab se set kiya hai
+      className="relative h-[300vh] bg-[#0a0a0a] text-white lg:pl-64"
+    >
+      {/* Sticky Container taake section screen par pin rahay */}
+      <div className="sticky top-0 flex h-screen w-full flex-col items-center justify-center overflow-hidden px-6">
+        
+        {/* Background Ambient Glow */}
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 h-[500px] w-[500px] rounded-full bg-accent/5 blur-[140px] pointer-events-none" />
 
-      <div className="relative mx-auto max-w-[1480px] px-6 md:px-12">
-        <div ref={titleRef} className="grid gap-10 lg:grid-cols-[1.25fr_0.75fr] lg:items-end">
-          <div>
-            <span className="inline-flex items-center gap-2 rounded-full border border-cream/35 px-3 py-1 text-xs font-black uppercase tracking-tight text-cream">
-              <Sparkles size={13} className="text-accent" /> Skills & tools
-            </span>
-            <h2 className="mt-5 max-w-3xl font-display text-5xl font-black leading-[0.94] tracking-tight md:text-7xl">
-              Built to feel <span className="text-accent">alive.</span>
-            </h2>
-          </div>
-          <p className="max-w-md text-lg leading-relaxed text-cream/65">
-            I pair solid engineering with an eye for the details that make a product feel effortless.
-          </p>
+        {/* TOP CENTER FIXED HEADER (Overlap fix karne ke liye margin/spacing de di hai) */}
+        <div className="absolute top-8 left-1/2 -translate-x-1/2 text-center z-20">
+          <span className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/5 px-3.5 py-1 text-[11px] font-black uppercase tracking-widest text-accent backdrop-blur-md">
+            <Sparkles size={12} className="text-accent" /> Expertise Flow
+          </span>
+          <h2 className="mt-2 font-display text-3xl font-black tracking-tight md:text-4xl">
+            Core <span className="text-accent">Capabilities</span>
+          </h2>
         </div>
 
-        <div className="mt-16 grid gap-5 lg:grid-cols-3">
-          {SKILL_GROUPS.map((group, index) => {
-            const Icon = group.icon
+        {/* CARDS CONTAINER (Compact size taake heading se distance maintain rahay) */}
+        <div className="relative w-full max-w-[440px] h-[380px] flex items-center justify-center mt-16">
+          {EXPERTISE_CARDS.map((card, index) => {
+            const Icon = card.icon
             return (
-              <article
-                key={group.title}
-                ref={(element) => (cardRefs.current[index] = element)}
-                className="group rounded-2xl border border-cream/15 bg-cream/7 p-6 transition-colors duration-300 hover:border-accent hover:bg-cream/10 md:p-7"
+              <div
+                key={card.id}
+                ref={(el) => (cardRefs.current[index] = el)}
+                className="absolute inset-0 rounded-3xl border border-white/15 bg-neutral-900/90 p-6 md:p-7 backdrop-blur-2xl shadow-[0_20px_60px_rgba(0,0,0,0.7)] flex flex-col justify-between"
               >
-                <div className="flex items-start justify-between">
-                  <span className="flex h-11 w-11 items-center justify-center rounded-xl bg-accent text-ink">
-                    <Icon size={21} strokeWidth={2.5} />
+                <div>
+                  <div className="flex items-center justify-between mb-4">
+                    <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-accent text-black shadow-md shadow-accent/20">
+                      <Icon size={20} strokeWidth={2.5} />
+                    </span>
+                    <span className="font-display text-2xl font-black text-white/20">
+                      {card.id}
+                    </span>
+                  </div>
+
+                  <span className="font-display text-[10px] font-bold uppercase tracking-widest text-accent">
+                    {card.subtitle}
                   </span>
-                  <span className="font-display text-5xl font-black text-cream/12">0{index + 1}</span>
+                  <h3 className="font-display text-xl md:text-2xl font-black text-white mt-0.5">
+                    {card.title}
+                  </h3>
+
+                  <p className="mt-2 text-xs md:text-sm leading-relaxed text-white/70 line-clamp-3">
+                    {card.desc}
+                  </p>
                 </div>
-                <h3 className="mt-12 font-display text-2xl font-black">{group.title}</h3>
-                <p className="mt-3 min-h-12 text-sm leading-relaxed text-cream/60">{group.description}</p>
-                <div className="mt-7 flex flex-wrap gap-2">
-                  {group.skills.map((skill) => (
-                    <span key={skill} className="rounded-md border border-cream/15 bg-ink px-2.5 py-1.5 text-xs font-bold text-cream/85">
-                      {skill}
+
+                <div className="pt-3 border-t border-white/10 flex flex-wrap gap-1.5">
+                  {card.tags.map((tag) => (
+                    <span 
+                      key={tag}
+                      className="text-[11px] font-bold px-2.5 py-1 rounded-md bg-white/5 border border-white/10 text-white/80"
+                    >
+                      {tag}
                     </span>
                   ))}
                 </div>
-              </article>
+              </div>
             )
           })}
         </div>
 
-        <div className="mt-16 border-y border-cream/15 py-4">
-          <div className="skills-ribbon flex w-max items-center gap-8 whitespace-nowrap font-display text-xl font-black uppercase tracking-tight text-cream/85">
-            {[...RIBBON_ITEMS, ...RIBBON_ITEMS].map((item, index) => (
-              <span key={`${item}-${index}`} className="flex items-center gap-8">
-                {item} <span className="text-accent">✦</span>
-              </span>
-            ))}
-          </div>
-        </div>
-
-        <div className="mt-12 flex flex-wrap items-center justify-between gap-5 text-sm text-cream/60">
-          <span className="inline-flex items-center gap-2"><Layers3 size={16} className="text-accent" /> Always learning, always refining.</span>
-          <span className="inline-flex items-center gap-2"><Braces size={16} className="text-accent" /> Clean code. Clear outcomes.</span>
-        </div>
       </div>
     </section>
   )

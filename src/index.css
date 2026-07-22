@@ -88,11 +88,23 @@ body {
 
 .project-device--laptop { border-radius: 13px 13px 8px 8px; padding: 9px 9px 15px; }
 .project-device--laptop::after { content: ''; position: absolute; left: -8%; bottom: -11px; width: 116%; height: 11px; border-radius: 0 0 10px 10px; background: linear-gradient(#8d8d8d,#383838); }
-.project-device--mobile { width: min(58%, 210px); border-width: 7px; border-radius: 28px; padding: 17px 7px 7px; }
-.project-device--mobile .project-device__screen { aspect-ratio: 9 / 16; }
+.project-device--mobile {
+  /* Width ko 58% -> 42% aur 210px -> 165px kar diya hai */
+  width: min(42%, 165px); 
+  border-width: 6px;
+  border-radius: 24px;
+  padding: 14px 6px 6px;
+}.project-device--mobile .project-device__screen { aspect-ratio: 9 / 16; }
 .project-device__topbar { position: absolute; top: 3px; left: 10px; z-index: 2; display: flex; gap: 3px; }
-.project-device--mobile .project-device__topbar { top: 7px; left: 50%; transform: translateX(-50%); width: 38px; height: 5px; border-radius: 20px; background: #2d2d2d; }
-.project-device__topbar span { width: 4px; height: 4px; border-radius: 999px; background: #777; }
+.project-device--mobile .project-device__topbar {
+  top: 5px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 32px;
+  height: 4px;
+  border-radius: 20px;
+  background: #2d2d2d;
+}.project-device__topbar span { width: 4px; height: 4px; border-radius: 999px; background: #777; }
 .project-device--mobile .project-device__topbar span { display: none; }
 .project-device__screen { position: relative; aspect-ratio: 16 / 10; overflow: hidden; background: #101010; }
 .project-device__screen video { width: 100%; height: 100%; object-fit: cover; display: block; filter: saturate(.82) contrast(1.1); }
@@ -110,4 +122,21 @@ body {
     transition-duration: 0.01ms !important;
     scroll-behavior: auto !important;
   }
+}
+
+/* Infinite horizontal scroll for the sidebar skills marquee.
+   The array is duplicated in JSX ([...SKILLS, ...SKILLS]) so this
+   animation can loop seamlessly at -50% (exactly halfway = one full set). */
+@keyframes marquee-scroll {
+  from { transform: translateX(0); }
+  to { transform: translateX(-50%); }
+}
+
+.sidebar-skill-track {
+  animation: marquee-scroll 12s linear infinite;
+}
+
+/* Pause on hover — nice touch for readability */
+.sidebar-skill-track:hover {
+  animation-play-state: paused;
 }
