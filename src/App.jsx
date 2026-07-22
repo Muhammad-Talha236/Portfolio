@@ -4,6 +4,9 @@ import SkillsShowcase from './components/sections/SkillsShowcase'
 import ProjectsShowcase from './components/sections/ProjectsShowcase'
 import CertificatesShowcase from './components/sections/CertificatesShowcase'
 import NameRevealShowcase from './components/sections/NameRevealShowcase'
+import Contact from './components/sections/Contact'
+
+
 function App() {
   useLenis()
   return (
@@ -13,6 +16,7 @@ function App() {
       <ProjectsShowcase />
       <CertificatesShowcase />
 <NameRevealShowcase/>
+<Contact />
     </div>
   )
 }
