@@ -92,8 +92,7 @@ function HeroToAbout() {
     window.history.replaceState(null, '', `#${id}`)
     window.scrollTo({ top: target, behavior: 'smooth' })
   }
-
-  useLayoutEffect(() => {
+useLayoutEffect(() => {
     const ctx = gsap.context(() => {
       const getDelta = (fromEl, toEl) => {
         if (!fromEl || !toEl) return { x: 0, y: 0, scale: 1 }
@@ -102,6 +101,14 @@ function HeroToAbout() {
         return { x: to.left - from.left, y: to.top - from.top, scale: to.width / from.width }
       }
 
+      // 1. CALCULATE DELTAS FIRST
+      // GSAP ke kisi bhi style apply hone se pehle natural size measure karna zaroori hai!
+      const nameDelta = getDelta(bgNameRef.current, sidebarLogoRef.current)
+      const ctaDelta = getDelta(resumeBtnRef.current, sidebarCtaRef.current)
+      const statDeltas = statCardRefs.current.map((el, i) => getDelta(el, sidebarStatRefs.current[i]))
+      const linkDeltas = navLinkRefs.current.map((el, i) => getDelta(el, sidebarLinkRefs.current[i]))
+
+      // 2. SET INITIAL STATIC STATES
       gsap.set(
         [bgNameRef.current, resumeBtnRef.current, ...statCardRefs.current],
         { transformOrigin: 'top left' }
@@ -109,33 +116,25 @@ function HeroToAbout() {
       gsap.set(aboutRef.current, { yPercent: 100 })
       gsap.set(sidebarLinkRefs.current, { opacity: 0 })
       gsap.set(sidebarRef.current, { opacity: 0 })
+      gsap.set(sidebarLogoRef.current, { opacity: 0 })
+      gsap.set(sidebarStatRefs.current, { opacity: 0 })
+      gsap.set(sidebarCtaRef.current, { opacity: 0 })
+      gsap.set(sidebarTaglineRef.current, { opacity: 0 })
 
-      // ---------- ENTRANCE (unchanged) ----------
+      // 3. ENTRANCE ANIMATION (On Load)
+      // Hum .fromTo use kar rahe hain taake start aur end values explicitly define hon.
       const intro = gsap.timeline({ defaults: { ease: 'power3.out' } })
       intro
-        .from(bgNameRef.current, { opacity: 0, y: -50, duration: 0.9 }, 0)
-        .from(headingRef.current, { opacity: 0, y: 30, duration: 0.7 }, 1.1)
-        .from(ctaBtnsRef.current, { opacity: 0, y: 20, duration: 0.6 }, 1.4)
-        .from(statCardRefs.current, { opacity: 0, scale: 0.7, y: 20, duration: 0.5, stagger: 0.15, ease: 'back.out(1.7)' }, 1.6)
-        .from([traitsCardRef.current, descCardRef.current], { opacity: 0, scale: 0.7, y: 20, duration: 0.5, stagger: 0.15, ease: 'back.out(1.7)' }, 1.75)
-        .from(introTextRef.current, { opacity: 0, duration: 0.6 }, 2.2)
+        .fromTo(bgNameRef.current, { opacity: 0, y: -50 }, { opacity: 1, y: 0, duration: 0.9 }, 0)
+        .fromTo(headingRef.current, { opacity: 0, y: 30 }, { opacity: 1, y: 0, duration: 0.7 }, 1.1)
+        .fromTo(ctaBtnsRef.current, { opacity: 0, y: 20 }, { opacity: 1, y: 0, duration: 0.6 }, 1.4)
+        .fromTo(statCardRefs.current, { opacity: 0, scale: 0.7, y: 20 }, { opacity: 1, scale: 1, y: 0, duration: 0.5, stagger: 0.15, ease: 'back.out(1.7)' }, 1.6)
+        .fromTo([traitsCardRef.current, descCardRef.current], { opacity: 0, scale: 0.7, y: 20 }, { opacity: 1, scale: 1, y: 0, duration: 0.5, stagger: 0.15, ease: 'back.out(1.7)' }, 1.75)
+        .fromTo(introTextRef.current, { opacity: 0 }, { opacity: 1, duration: 0.6 }, 2.2)
 
-      // ================================================================
-      // SCROLL-LINKED MORPH — rebuilt so every tween has an EXPLICIT
-      // duration, and the whole timeline is normalized to run from 0 → 1.
-      // This is what was broken before: unspecified durations defaulted
-      // to 0.5s each, silently stretching the real timeline length and
-      // desyncing every "start position" from what it visually looked like.
-      // Now: position + duration together = a predictable 0–1 map, and
-      // every fade-out/fade-in PAIR shares identical timing so there's
-      // never a moment where both the Hero element and its Sidebar
-      // counterpart are visible at once (no more ghost duplicates).
-      // ================================================================
-      const nameDelta = getDelta(bgNameRef.current, sidebarLogoRef.current)
-      const ctaDelta = getDelta(resumeBtnRef.current, sidebarCtaRef.current)
-      const statDeltas = statCardRefs.current.map((el, i) => getDelta(el, sidebarStatRefs.current[i]))
-      const linkDeltas = navLinkRefs.current.map((el, i) => getDelta(el, sidebarLinkRefs.current[i]))
-
+      // 4. SCROLL-LINKED MORPH
+      // immediateRender: false isliye lagaya hai taake scroll wali animation
+      // page load ki intro animation ko kharab na kare.
       const tl = gsap.timeline({
         scrollTrigger: {
           trigger: sectionRef.current,
@@ -144,6 +143,7 @@ function HeroToAbout() {
           scrub: 1,
           pin: true,
           anticipatePin: 1,
+          invalidateOnRefresh: true, // Resize hone par coordinates update karega
           onUpdate: (self) => {
             const nextSection = self.progress >= 0.72 ? 'about' : 'home'
             if (activeSectionRef.current !== nextSection) {
@@ -153,65 +153,63 @@ function HeroToAbout() {
           },
         },
       })
+
       scrollTriggerRef.current = tl.scrollTrigger
       sceneTimelineRef.current = tl
 
-      // Giant name → sidebar logo: travels 0→0.55, crossfades to real logo 0.55→0.68
-      tl.to(bgNameRef.current, { x: nameDelta.x, y: nameDelta.y, scale: nameDelta.scale, duration: 0.55, ease: 'none' }, 0)
-      tl.to(bgNameRef.current, { opacity: 0, duration: 0.13, ease: 'none' }, 0.55)
+      // Giant name crossfade
+      tl.fromTo(bgNameRef.current,
+        { x: 0, y: 0, scale: 1 },
+        { x: nameDelta.x, y: nameDelta.y, scale: nameDelta.scale, duration: 0.55, ease: 'none', immediateRender: false }, 0)
+      tl.fromTo(bgNameRef.current,
+        { opacity: 1 },
+        { opacity: 0, duration: 0.13, ease: 'none', immediateRender: false }, 0.55)
       tl.to(sidebarLogoRef.current, { opacity: 1, duration: 0.13, ease: 'none' }, 0.55)
-      // Sidebar logo starts invisible (matches crossfade above)
-      gsap.set(sidebarLogoRef.current, { opacity: 0 })
 
-      // Small hero-nav logo pill fades early (name is doing the heavy lifting by then)
-      tl.to(navLogoRef.current, { opacity: 0, duration: 0.1, ease: 'none' }, 0.15)
+      // Small hero-nav logo pill
+      tl.fromTo(navLogoRef.current, { opacity: 1 }, { opacity: 0, duration: 0.1, ease: 'none', immediateRender: false }, 0.15)
 
-      // Nav links: each travels individually 0.05→0.6 (staggered start), 
-      // then crossfades to icon-labels 0.68→0.78
+      // Nav links morph
       navLinkRefs.current.forEach((el, i) => {
         const start = 0.05 + i * 0.03
-        tl.to(el, { x: linkDeltas[i].x, y: linkDeltas[i].y, duration: 0.55, ease: 'none' }, start)
+        tl.fromTo(el, { x: 0, y: 0 }, { x: linkDeltas[i].x, y: linkDeltas[i].y, duration: 0.55, ease: 'none', immediateRender: false }, start)
       })
-      tl.to(navLinkRefs.current, { opacity: 0, duration: 0.1, ease: 'none' }, 0.68)
+      tl.fromTo(navLinkRefs.current, { opacity: 1 }, { opacity: 0, duration: 0.1, ease: 'none', immediateRender: false }, 0.68)
       tl.to(sidebarLinkRefs.current, { opacity: 1, duration: 0.1, ease: 'none' }, 0.68)
 
-      // Stat cards: travel + SCALE 0.1→0.6 (explicit duration = scale is now
-      // clearly visible across this window), crossfade 0.6→0.7
+      // Stat cards morph
       statCardRefs.current.forEach((el, i) => {
-        tl.to(el, {
-          x: statDeltas[i].x, y: statDeltas[i].y, scale: statDeltas[i].scale,
-          duration: 0.5, ease: 'none',
-        }, 0.1 + i * 0.05)
+        tl.fromTo(el, { x: 0, y: 0, scale: 1 }, { x: statDeltas[i].x, y: statDeltas[i].y, scale: statDeltas[i].scale, duration: 0.5, ease: 'none', immediateRender: false }, 0.1 + i * 0.05)
       })
-      tl.to(statCardRefs.current, { opacity: 0, duration: 0.1, ease: 'none' }, 0.6)
+      tl.fromTo(statCardRefs.current, { opacity: 1 }, { opacity: 0, duration: 0.1, ease: 'none', immediateRender: false }, 0.6)
       tl.to(sidebarStatRefs.current, { opacity: 1, duration: 0.1, ease: 'none' }, 0.6)
-      gsap.set(sidebarStatRefs.current, { opacity: 0 })
 
-      // Trait/description cards: no sidebar home, drift up & fully gone by 0.4
-      tl.to([traitsCardRef.current, descCardRef.current, introTextRef.current], {
-        y: -60, opacity: 0, duration: 0.22, ease: 'none',
-      }, 0.35)
+      // Trait/description cards & intro text fade up
+      tl.fromTo([traitsCardRef.current, descCardRef.current, introTextRef.current],
+        { y: 0, opacity: 1 },
+        { y: -60, opacity: 0, duration: 0.22, ease: 'none', immediateRender: false }, 0.35)
 
-      // Heading + tagline dissolve 0.15→0.4
-      tl.to(headingRef.current, { y: -40, scale: 0.92, opacity: 0, duration: 0.2, ease: 'none' }, 0.45)
+      // Heading + tagline dissolve
+      tl.fromTo(headingRef.current,
+        { y: 0, scale: 1, opacity: 1 },
+        { y: -40, scale: 0.92, opacity: 0, duration: 0.2, ease: 'none', immediateRender: false }, 0.45)
 
-      // Resume button: travel 0.25→0.65, crossfade to sidebar CTA 0.65→0.75
-      tl.to(resumeBtnRef.current, { x: ctaDelta.x, y: ctaDelta.y, scale: ctaDelta.scale, duration: 0.4, ease: 'none' }, 0.25)
-      tl.to(resumeBtnRef.current, { opacity: 0, duration: 0.1, ease: 'none' }, 0.65)
+      // Resume button morph
+      tl.fromTo(resumeBtnRef.current, { x: 0, y: 0, scale: 1 }, { x: ctaDelta.x, y: ctaDelta.y, scale: ctaDelta.scale, duration: 0.4, ease: 'none', immediateRender: false }, 0.25)
+      tl.fromTo(resumeBtnRef.current, { opacity: 1 }, { opacity: 0, duration: 0.1, ease: 'none', immediateRender: false }, 0.65)
       tl.to(sidebarCtaRef.current, { opacity: 1, duration: 0.1, ease: 'none' }, 0.65)
-      gsap.set(sidebarCtaRef.current, { opacity: 0 })
 
-      tl.to(ctaBtnsRef.current, { opacity: 0, y: 40, duration: 0.2, ease: 'none' }, 0.42)
+      // CTA Buttons disappear
+      tl.fromTo(ctaBtnsRef.current, { opacity: 1, y: 0 }, { opacity: 0, y: 40, duration: 0.2, ease: 'none', immediateRender: false }, 0.42)
 
-      // Sidebar backdrop + tagline fade in gradually as content arrives
+      // Sidebar backdrop & tagline fade in
       tl.to(sidebarRef.current, { opacity: 1, duration: 0.3, ease: 'none' }, 0.4)
       tl.to(sidebarTaglineRef.current, { opacity: 1, duration: 0.15, ease: 'none' }, 0.7)
-      gsap.set(sidebarTaglineRef.current, { opacity: 0 })
 
-      // About slides up 0.45→1.0 — arrives exactly as Hero finishes dissolving
+      // About slides up
       tl.to(aboutRef.current, { yPercent: 0, duration: 0.55, ease: 'none' }, 0.45)
-    }, sectionRef)
 
+    }, sectionRef)
     return () => ctx.revert()
   }, [])
 
