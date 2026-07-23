@@ -15,7 +15,7 @@ const PROJECTS = [
   device: 'laptop',
   github: 'https://github.com/Muhammad-Talha236/Eventra_',
   video: '/videos/eventra.mp4',
-  poster: '/images/eventra.png',
+  poster: '/images/sports.jpg',
   tone: 'violet',
 },
  
@@ -24,7 +24,7 @@ const PROJECTS = [
   title: 'Core Banking System',
   description: 'A secure banking platform designed to manage customer accounts, transactions, and essential banking operations.',
   tags: ['React', 'Node.js', 'Express', 'MongoDB'],
-  device: 'mobile',
+  device: 'laptop',
   github: 'https://github.com/Muhammad-Talha236/Core_Bank_System',
   video: '/videos/corebanking.mp4',
   poster: '/images/corebank.jpg',
@@ -38,7 +38,7 @@ const PROJECTS = [
   device: 'laptop',
   github: 'https://github.com/Muhammad-Talha236/Split_Nest',
   video: '/videos/splitnest.mp4',
-  poster: '/images/split.jpg',
+  poster: '/images/paisa.jpg',
   tone: 'blue',
 },
  {

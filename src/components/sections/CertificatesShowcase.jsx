@@ -185,7 +185,7 @@ function CertificatesShowcase() {
                         
                         <div className="py-2 space-y-2">
                           <div>
-                            <span className="text-[10px] font-black uppercase tracking-widest text-black/50 block">Recipient</span>
+                            <span className="text-[10px] font-black uppercase tracking-widest text-black/50 block">By Coursera</span>
                             <p className="font-display text-lg sm:text-xl font-black text-black">{cert.recipient}</p>
                           </div>
                           <div className="bg-black/5 rounded-xl p-3 border border-black/5">
@@ -246,7 +246,7 @@ function CertificatesShowcase() {
                       <span className="text-[10px] font-mono font-bold text-black/40">{cert.id}</span>
                       <span className="flex flex-1 items-center justify-center">
                         <span className="block whitespace-nowrap rotate-90 origin-center font-display text-xs sm:text-sm font-black uppercase tracking-[0.15em] sm:tracking-[0.2em] text-black/80">
-                          {cert.title} Ticket
+                          {cert.title}
                         </span>
                       </span>
                       <Award size={16} strokeWidth={2.5} className="text-black/40" />
