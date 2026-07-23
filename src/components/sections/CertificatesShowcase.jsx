@@ -17,7 +17,24 @@ function CertificatesShowcase() {
   const [startX, setStartX] = useState(0)
   const [scrollLeft, setScrollLeft] = useState(0)
 
+  // The expanded/collapsed card widths were hardcoded px values (640/120) tuned
+  // for desktop. On phones that overflows the viewport, so we recompute them
+  // against the current window width and keep them in sync on resize/rotate.
+  const [cardWidths, setCardWidths] = useState({ active: 640, collapsed: 120 })
+
   useEffect(() => setMounted(true), [])
+
+  useEffect(() => {
+    const computeWidths = () => {
+      const vw = window.innerWidth
+      const active = Math.min(640, vw - (vw < 640 ? 48 : 96))
+      const collapsed = vw < 480 ? 72 : vw < 768 ? 96 : 120
+      setCardWidths({ active, collapsed })
+    }
+    computeWidths()
+    window.addEventListener('resize', computeWidths)
+    return () => window.removeEventListener('resize', computeWidths)
+  }, [])
 
   const scrollToCard = (index) => {
     setActiveIndex(index)
@@ -72,19 +89,19 @@ function CertificatesShowcase() {
   if (!mounted) return null
 
   const content = (
-    <section id="credentials" className="relative z-20 w-full bg-[#ddd8cb] py-28 text-ink">
+    <section id="credentials" className="relative z-20 w-full bg-[#ddd8cb] py-20 text-ink sm:py-24 md:py-28">
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,rgba(0,0,0,0.03),transparent_60%)] pointer-events-none" />
       
       {/* FIX: lg:pl-96 se hata kar lg:pl-72 kar diya hai taake sidebar ke sath gap kam ho jaye aur content left shift ho kar adjust ho jaye */}
-      <div className="relative mx-auto w-full max-w-[1600px] px-6 md:px-12 lg:pl-72 lg:pr-16">
+      <div className="relative mx-auto w-full max-w-[1600px] px-4 sm:px-6 md:px-12 lg:pl-72 lg:pr-16">
         
         {/* Header & Controls */}
-        <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-12">
+        <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-10 md:mb-12">
           <div>
             <span className="inline-flex items-center gap-2 rounded-full border border-black/20 bg-black/5 px-4 py-1.5 text-xs font-black uppercase tracking-widest text-black backdrop-blur-md">
               <Award size={14} className="text-black" /> Collectible Credentials
             </span>
-            <h2 className="mt-4 font-display font-black tracking-tight text-black leading-[1.05]" style={{ fontSize: 'clamp(32px, 6vw, 72px)' }}>
+            <h2 className="mt-4 font-display font-black tracking-tight text-black leading-[1.05]" style={{ fontSize: 'clamp(28px, 6vw, 72px)' }}>
               Achievements <span className="underline decoration-black/30 decoration-wavy underline-offset-8"></span>
             </h2>
           </div>
@@ -92,14 +109,14 @@ function CertificatesShowcase() {
             <button
               onClick={handlePrev}
               aria-label="Previous certificate"
-              className="w-12 h-12 rounded-full border border-black/20 bg-white/40 flex items-center justify-center text-black transition-all hover:bg-black hover:text-[#f0ff3d] hover:scale-105 shadow-sm cursor-pointer"
+              className="w-11 h-11 sm:w-12 sm:h-12 rounded-full border border-black/20 bg-white/40 flex items-center justify-center text-black transition-all hover:bg-black hover:text-[#f0ff3d] hover:scale-105 shadow-sm cursor-pointer"
             >
               <ChevronLeft size={22} strokeWidth={2.5} />
             </button>
             <button
               onClick={handleNext}
               aria-label="Next certificate"
-              className="w-12 h-12 rounded-full border border-black/20 bg-white/40 flex items-center justify-center text-black transition-all hover:bg-black hover:text-[#f0ff3d] hover:scale-105 shadow-sm cursor-pointer"
+              className="w-11 h-11 sm:w-12 sm:h-12 rounded-full border border-black/20 bg-white/40 flex items-center justify-center text-black transition-all hover:bg-black hover:text-[#f0ff3d] hover:scale-105 shadow-sm cursor-pointer"
             >
               <ChevronRight size={22} strokeWidth={2.5} />
             </button>
@@ -113,7 +130,7 @@ function CertificatesShowcase() {
           onMouseLeave={handleMouseLeave}
           onMouseUp={handleMouseUp}
           onMouseMove={handleMouseMove}
-          className={`certs-scroll relative flex items-center justify-start gap-6 overflow-x-auto overflow-y-visible scroll-smooth py-10 pl-2 md:pl-4 w-full ${
+          className={`certs-scroll relative flex items-center justify-start gap-4 sm:gap-6 overflow-x-auto overflow-y-visible scroll-smooth py-10 pl-2 md:pl-4 w-full ${
             isDragging ? 'cursor-grabbing' : 'cursor-grab'
           }`}
           style={{ touchAction: 'pan-x' }}
@@ -126,7 +143,7 @@ function CertificatesShowcase() {
                 ref={(el) => (cardRefs.current[index] = el)}
                 onClick={() => handleCardClick(index)}
                 animate={{
-                  width: isActive ? 640 : 120,
+                  width: isActive ? cardWidths.active : cardWidths.collapsed,
                 }}
                 transition={{ type: 'spring', stiffness: 280, damping: 28 }}
                 whileHover={!isActive ? { y: -6 } : {}}
@@ -152,24 +169,24 @@ function CertificatesShowcase() {
                       transition={{ duration: 0.15 }}
                       className="absolute inset-0 flex items-stretch"
                     >
-                      <div className="flex-1 p-5 md:p-6 flex flex-col justify-between relative overflow-hidden">
-                        <div className="flex items-center justify-between border-b border-black/10 pb-3">
-                          <div className="flex items-center gap-3">
-                            <div className="w-10 h-10 rounded-xl bg-black text-[#f0ff3d] flex items-center justify-center shadow-md">
-                              <Award size={20} strokeWidth={2.5} />
+                      <div className="flex-1 min-w-0 p-4 sm:p-5 md:p-6 flex flex-col justify-between relative overflow-hidden">
+                        <div className="flex items-center justify-between border-b border-black/10 pb-3 gap-2">
+                          <div className="flex items-center gap-2 sm:gap-3 min-w-0">
+                            <div className="w-9 h-9 sm:w-10 sm:h-10 shrink-0 rounded-xl bg-black text-[#f0ff3d] flex items-center justify-center shadow-md">
+                              <Award size={18} strokeWidth={2.5} />
                             </div>
-                            <div>
-                              <h4 className="font-display text-lg font-black tracking-wider uppercase">{cert.title}</h4>
-                              <p className="text-[11px] font-semibold text-black/60">{cert.subtitle}</p>
+                            <div className="min-w-0">
+                              <h4 className="font-display text-sm sm:text-lg font-black tracking-wider uppercase truncate">{cert.title}</h4>
+                              <p className="text-[10px] sm:text-[11px] font-semibold text-black/60 truncate">{cert.subtitle}</p>
                             </div>
                           </div>
-                          <span className="text-xs font-mono font-bold tracking-widest text-black/40">{cert.certId}</span>
+                          <span className="hidden sm:inline text-xs font-mono font-bold tracking-widest text-black/40 shrink-0">{cert.certId}</span>
                         </div>
                         
                         <div className="py-2 space-y-2">
                           <div>
                             <span className="text-[10px] font-black uppercase tracking-widest text-black/50 block">Recipient</span>
-                            <p className="font-display text-xl font-black text-black">{cert.recipient}</p>
+                            <p className="font-display text-lg sm:text-xl font-black text-black">{cert.recipient}</p>
                           </div>
                           <div className="bg-black/5 rounded-xl p-3 border border-black/5">
                             <p className="text-xs md:text-sm font-medium leading-relaxed text-black/80">{cert.achievement}</p>
@@ -183,12 +200,12 @@ function CertificatesShowcase() {
                           </div>
                         </div>
 
-                        <div className="flex items-end justify-between pt-3 border-t border-black/10">
-                          <div className="space-y-1">
-                            <span className="text-[10px] font-bold text-black/50 uppercase tracking-wider block">Issued By: {cert.issuer}</span>
+                        <div className="flex items-end justify-between pt-3 border-t border-black/10 gap-2">
+                          <div className="space-y-1 min-w-0">
+                            <span className="text-[10px] font-bold text-black/50 uppercase tracking-wider block truncate">Issued By: {cert.issuer}</span>
                             <div className="flex items-center gap-2">
-                              <QrCode size={24} className="text-black/80" />
-                              <span className="text-xs font-mono font-bold text-black/70">{cert.date}</span>
+                              <QrCode size={22} className="text-black/80 shrink-0" />
+                              <span className="text-[11px] sm:text-xs font-mono font-bold text-black/70">{cert.date}</span>
                             </div>
                           </div>
                           <a
@@ -196,7 +213,7 @@ function CertificatesShowcase() {
                             target="_blank"
                             rel="noreferrer"
                             onClick={(e) => e.stopPropagation()}
-                            className="inline-flex items-center gap-1.5 rounded-full bg-[#f0ff3d] px-5 py-2.5 text-xs font-black text-black shadow-md transition-transform hover:scale-105"
+                            className="inline-flex shrink-0 items-center gap-1.5 rounded-full bg-[#f0ff3d] px-4 sm:px-5 py-2 sm:py-2.5 text-[11px] sm:text-xs font-black text-black shadow-md transition-transform hover:scale-105"
                           >
                             Verify <ArrowUpRight size={14} strokeWidth={3} />
                           </a>
@@ -207,10 +224,10 @@ function CertificatesShowcase() {
                         <div className="absolute inset-y-4 border-r-2 border-dashed border-black/20" />
                       </div>
 
-                      <div className="w-[80px] md:w-[88px] p-4 flex flex-col items-center justify-between rounded-r-[2rem] bg-black/5 text-black relative">
+                      <div className="w-[64px] sm:w-[80px] md:w-[88px] shrink-0 p-3 sm:p-4 flex flex-col items-center justify-between rounded-r-[2rem] bg-black/5 text-black relative">
                         <span className="text-[10px] font-mono font-bold text-black/40">{cert.id}</span>
                         <div className="my-auto py-4">
-                          <span className="block font-display text-sm font-black tracking-[0.25em] uppercase whitespace-nowrap rotate-90 origin-center text-black/80">
+                          <span className="block font-display text-xs sm:text-sm font-black tracking-[0.2em] sm:tracking-[0.25em] uppercase whitespace-nowrap rotate-90 origin-center text-black/80">
                             {cert.badgeText}
                           </span>
                         </div>
@@ -228,7 +245,7 @@ function CertificatesShowcase() {
                     >
                       <span className="text-[10px] font-mono font-bold text-black/40">{cert.id}</span>
                       <span className="flex flex-1 items-center justify-center">
-                        <span className="block whitespace-nowrap rotate-90 origin-center font-display text-sm font-black uppercase tracking-[0.2em] text-black/80">
+                        <span className="block whitespace-nowrap rotate-90 origin-center font-display text-xs sm:text-sm font-black uppercase tracking-[0.15em] sm:tracking-[0.2em] text-black/80">
                           {cert.title} Ticket
                         </span>
                       </span>

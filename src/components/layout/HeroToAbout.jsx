@@ -1,6 +1,6 @@
 import { useRef, useLayoutEffect, useState } from 'react'
 import { createPortal } from 'react-dom'
-import { Home, CircleUser, Briefcase, Zap, Mail, ArrowUpRight, Lightbulb, ShieldCheck, Target, Users } from 'lucide-react'
+import { Home, CircleUser, Briefcase, Zap, Mail, ArrowUpRight, Lightbulb, ShieldCheck, Target, Users, Menu, X } from 'lucide-react'
 import gsap from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
 import About from '../sections/About'
@@ -32,6 +32,7 @@ function HeroToAbout() {
   const sceneTimelineRef = useRef(null)
   const activeSectionRef = useRef('home')
   const [activeSection, setActiveSection] = useState('home')
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
 
   const bgNameRef = useRef(null)
   const navLogoRef = useRef(null)
@@ -92,8 +93,24 @@ function HeroToAbout() {
     window.history.replaceState(null, '', `#${id}`)
     window.scrollTo({ top: target, behavior: 'smooth' })
   }
+
+  const handleMobileNav = (event, id) => {
+    setMobileMenuOpen(false)
+    // Only home/about need the special morph-scroll handling; everything
+    // else is a normal in-page anchor and can fall through to default behavior.
+    if (id === 'home' || id === 'about') {
+      handleNavigation(event, id)
+    }
+  }
+
 useLayoutEffect(() => {
-    const ctx = gsap.context(() => {
+    // Desktop-only pinned morph scene. Below lg we render a simple stacked
+    // mobile header + About block instead (see JSX), so skip all GSAP wiring
+    // there to avoid measuring/animating elements that aren't laid out the same way.
+    const mm = gsap.matchMedia()
+
+    mm.add('(min-width: 1024px)', () => {
+      const ctx = gsap.context(() => {
       const getDelta = (fromEl, toEl) => {
         if (!fromEl || !toEl) return { x: 0, y: 0, scale: 1 }
         const from = fromEl.getBoundingClientRect()
@@ -209,15 +226,35 @@ useLayoutEffect(() => {
       // About slides up
       tl.to(aboutRef.current, { yPercent: 0, duration: 0.55, ease: 'none' }, 0.45)
 
-    }, sectionRef)
-    return () => ctx.revert()
+      }, sectionRef)
+      return () => ctx.revert()
+    })
+
+    // Mobile/tablet: no pin, no morph — just make sure the About block sits
+    // in normal flow right under the hero and the sidebar/name-crossfade
+    // layers are invisible/reset so they don't leave stray transforms.
+    mm.add('(max-width: 1023.98px)', () => {
+      gsap.set(aboutRef.current, { yPercent: 0, clearProps: 'transform' })
+      gsap.set(sidebarRef.current, { opacity: 0 })
+
+      const intro = gsap.timeline({ defaults: { ease: 'power3.out' } })
+      intro
+        .fromTo(bgNameRef.current, { opacity: 0, y: -30 }, { opacity: 1, y: 0, duration: 0.8 }, 0)
+        .fromTo(headingRef.current, { opacity: 0, y: 24 }, { opacity: 1, y: 0, duration: 0.6 }, 0.5)
+        .fromTo(ctaBtnsRef.current, { opacity: 0, y: 16 }, { opacity: 1, y: 0, duration: 0.5 }, 0.8)
+        .fromTo(introTextRef.current, { opacity: 0 }, { opacity: 1, duration: 0.5 }, 1.1)
+
+      return () => intro.kill()
+    })
+
+    return () => mm.revert()
   }, [])
 
   return (
-    <div id="home" ref={sectionRef} className="relative h-screen overflow-hidden bg-background">
+    <div id="home" ref={sectionRef} className="relative min-h-screen overflow-hidden bg-background lg:h-screen">
       {/* ============ HERO LAYER ============ */}
-      <section className="absolute inset-0 z-20 flex flex-col items-center justify-center overflow-hidden pt-20">
-        <header className="fixed inset-x-0 top-0 z-40 flex items-center justify-between px-6 py-6 md:px-10">
+      <section className="relative z-20 flex min-h-screen flex-col items-center overflow-hidden pt-28 pb-10 lg:absolute lg:inset-0 lg:justify-center lg:pt-20 lg:pb-0">
+        <header className="fixed inset-x-0 top-0 z-40 flex items-center justify-between px-4 py-4 sm:px-6 md:py-6 md:px-10">
           <div ref={navLogoRef} className="flex items-center gap-2">
             <span className="flex h-8 w-8 items-center justify-center rounded-full bg-accent font-display text-sm font-black text-ink">
               T
@@ -225,7 +262,7 @@ useLayoutEffect(() => {
             <span className="font-display text-sm font-bold text-ink">TALHA</span>
           </div>
 
-          <nav className="hidden items-center gap-10 md:flex">
+          <nav className="hidden items-center gap-10 lg:flex">
             {NAV_ITEMS.map((item, i) => (
               <a
                 key={item.id}
@@ -256,59 +293,137 @@ useLayoutEffect(() => {
             ))}
           </nav>
 
-          
-          <a
-            ref={resumeBtnRef}
-            href="/resume.pdf"
-            target="_blank"
-            rel="noreferrer"
-            className=" flex
-            items-center
-            gap-1.5
-            rounded-full
-            bg-[#f0ff3d]
-            px-5
-            h-10
-            text-[13px]
-            font-semibold
-            text-black
-            transition-all
-            duration-300
-            hover:scale-105"
-          >
-            Resume <ArrowUpRight size={14} strokeWidth={3} />
-          </a>
+          <div className="flex items-center gap-2 sm:gap-3">
+            <a
+              ref={resumeBtnRef}
+              href="/resume.pdf"
+              target="_blank"
+              rel="noreferrer"
+              className=" flex
+              items-center
+              gap-1.5
+              rounded-full
+              bg-[#f0ff3d]
+              px-4
+              sm:px-5
+              h-9
+              sm:h-10
+              text-[12px]
+              sm:text-[13px]
+              font-semibold
+              text-black
+              transition-all
+              duration-300
+              hover:scale-105"
+            >
+              Resume <ArrowUpRight size={14} strokeWidth={3} />
+            </a>
+
+            {/* Mobile / tablet hamburger — the morphing desktop sidebar nav
+                isn't usable below lg, so we give small screens a normal
+                slide-down menu instead. */}
+            <button
+              type="button"
+              onClick={() => setMobileMenuOpen((prev) => !prev)}
+              aria-label={mobileMenuOpen ? 'Close menu' : 'Open menu'}
+              aria-expanded={mobileMenuOpen}
+              className="flex h-9 w-9 items-center justify-center rounded-full bg-ink text-white transition-transform active:scale-95 lg:hidden"
+            >
+              {mobileMenuOpen ? <X size={18} /> : <Menu size={18} />}
+            </button>
+          </div>
         </header>
 
-        <div className="pointer-events-none absolute inset-x-0 top-[20%] z-10 flex justify-center">
+        {/* Mobile / tablet dropdown nav */}
+        {mobileMenuOpen && (
+          <nav className="fixed inset-x-4 top-[72px] z-40 flex flex-col gap-1 rounded-2xl border border-black/10 bg-panel/95 p-3 shadow-xl backdrop-blur-xl sm:inset-x-6 lg:hidden">
+            {NAV_ITEMS.map((item) => {
+              const Icon = item.icon
+              return (
+                <a
+                  key={item.id}
+                  href={`#${item.id}`}
+                  onClick={(event) => handleMobileNav(event, item.id)}
+                  className="flex items-center gap-3 rounded-xl px-4 py-3 text-sm font-bold text-ink/80 transition-colors hover:bg-accent hover:text-ink"
+                >
+                  <Icon size={17} strokeWidth={2.5} />
+                  {item.label}
+                </a>
+              )
+            })}
+          </nav>
+        )}
+
+        {/* Giant "TALHA" wordmark. On mobile/tablet this is a normal block that
+            pushes the heading below it in document flow — the old version kept
+            it `absolute` at every size, so on phones it sat directly on top of
+            the heading/CTAs instead of behind them (illegible overlap). At lg
+            it goes back to being an absolute backdrop layer, exactly like
+            before, since that's what the pinned scroll-morph measures against. */}
+        <div className="pointer-events-none z-10 flex w-full justify-center px-2 lg:absolute lg:inset-x-0 lg:top-[20%] lg:px-0">
           <h1
             ref={bgNameRef}
             aria-hidden="true"
-            className="select-none font-display leading-none tracking-tight text-accent"
-            style={{ fontSize: 'clamp(100px, 40vw, 300px)', fontWeight: 900 }}
+            className="select-none font-display font-black leading-[0.85] tracking-tight text-accent text-[clamp(52px,20vw,140px)] sm:text-[clamp(64px,17vw,190px)] md:text-[clamp(80px,15vw,240px)] lg:text-[clamp(100px,40vw,300px)] lg:leading-none"
           >
             TALHA
           </h1>
         </div>
 
-        <div className="relative top-[25%] flex w-full max-w-4xl flex-col items-center px-4">
+        <div className="relative mt-4 flex w-full max-w-4xl flex-col items-center px-4 sm:mt-6 lg:top-[25%] lg:mt-0">
           <h2
             ref={headingRef}
-            className="text-center font-display font-extrabold leading-[1.05] text-cream drop-shadow-[0_2px_12px_rgba(0,0,0,0.5)]"
-            style={{ fontSize: 'clamp(30px, 4.5vw, 58px)' }}
+            className="text-center font-display font-extrabold leading-[1.15] text-cream drop-shadow-[0_2px_12px_rgba(0,0,0,0.5)] text-[clamp(24px,6vw,32px)] sm:text-[clamp(28px,4.5vw,42px)] lg:text-[clamp(30px,4.5vw,58px)] lg:leading-[1.05]"
           >
             Full Stack Developer
             <br />
             Building Digital Products.
           </h2>
 
-          <div ref={ctaBtnsRef} className="mt-6 flex gap-4">
-            <a href="#contact" className="rounded-lg bg-accent px-7 py-3 font-display font-bold text-ink shadow-md">
+          <div ref={ctaBtnsRef} className="mt-6 flex w-full flex-col gap-3 xs:w-auto xs:flex-row xs:gap-4">
+            <a href="#contact" className="rounded-lg bg-accent px-7 py-3 text-center font-display font-bold text-ink shadow-md">
               Hire Me
             </a>
-            <a href="#projects" className="rounded-lg border-2 border-ink px-7 py-3 font-display font-bold text-ink">
+            <a href="#projects" className="rounded-lg border-2 border-ink px-7 py-3 text-center font-display font-bold text-ink">
               View Projects
             </a>
+          </div>
+
+          {/* Mobile/tablet fallback for the desktop floating stat/trait/description
+              cards below — those are `hidden lg:block` and absolutely positioned,
+              so small screens get this simple stacked equivalent instead. */}
+          <div className="mt-8 grid w-full grid-cols-2 gap-3 sm:mt-10 sm:max-w-md lg:hidden">
+            <div className="flex items-center gap-3 rounded-2xl bg-panel/70 p-4 backdrop-blur-md">
+              <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-ink">
+                <Zap size={18} className="text-accent" strokeWidth={2.5} />
+              </span>
+              <div>
+                <p className="font-display text-xl font-black leading-none text-ink">10+</p>
+                <p className="text-[11px] font-semibold text-ink/60">Projects Delivered</p>
+              </div>
+            </div>
+
+            <div className="flex flex-col justify-center rounded-2xl bg-panel/70 p-4 backdrop-blur-md">
+              <p className="font-display text-2xl font-black leading-none text-accent">2+</p>
+              <p className="mt-1 text-[11px] font-semibold text-ink/70">Years Coding</p>
+            </div>
+
+            <div className="col-span-2 rounded-2xl bg-panel/70 p-4 backdrop-blur-md">
+              <div className="flex flex-wrap gap-x-4 gap-y-2">
+                {TRAITS.map(({ icon: Icon, label }) => (
+                  <div key={label} className="flex items-center gap-1.5">
+                    <Icon size={14} className="text-ink" strokeWidth={2.5} />
+                    <span className="text-xs font-bold text-ink">{label}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            <div className="col-span-2 rounded-2xl bg-panel/70 p-4 backdrop-blur-md">
+              <p className="text-xs leading-relaxed text-ink/80 sm:text-sm">
+                I build modern digital products with clean code and premium user experiences.
+              </p>
+            </div>
           </div>
         </div>
 
@@ -358,16 +473,16 @@ useLayoutEffect(() => {
           </p>
         </div>
 
-        <p ref={introTextRef} className="absolute bottom-6 left-6 z-10 max-w-55 text-xs font-medium text-ink/70">
+        <p ref={introTextRef} className="absolute bottom-6 left-6 z-10 hidden max-w-55 text-xs font-medium text-ink/70 lg:block">
           Full Stack Developer — building scalable web applications with modern technologies.
         </p>
       </section>
 
-    {/* ============ SIDEBAR LAYER (final morph target) ============ */}
+    {/* ============ SIDEBAR LAYER (final morph target, desktop only) ============ */}
       {createPortal(
         <aside
           ref={sidebarRef}
-          className="fixed left-0 top-0 z-50 flex h-[100svh] w-56 flex-col justify-between overflow-y-auto overflow-x-hidden p-4 pb-6 custom-scrollbar"
+          className="fixed left-0 top-0 z-50 hidden h-[100svh] w-56 flex-col justify-between overflow-y-auto overflow-x-hidden p-4 pb-6 custom-scrollbar lg:flex"
         >
           {/* Top Section */}
           <div className="flex flex-col gap-2">

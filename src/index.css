@@ -16,6 +16,11 @@
   /* Fonts */
   --font-display: "Inter Tight", sans-serif;
   --font-body: "Inter", sans-serif;
+
+  /* Extra small breakpoint (used for tight mobile layout tweaks like
+     "stack CTAs below 400px, put them side-by-side above it"). Tailwind
+     v4 doesn't ship this by default, so it's declared here. */
+  --breakpoint-xs: 400px;
 }
 
 /* Base resets */
@@ -32,6 +37,21 @@ body {
   color: var(--color-ink);
   font-family: var(--font-body);
   overflow-x: hidden; /* prevents horizontal scroll from big oversized headline text */
+  width: 100%;
+}
+
+/* Belt-and-suspenders: some sections render via createPortal directly under
+   <body> with large/animated transforms (hero name, marquees, pinned rails).
+   Keeping the root wrapper and body clipped horizontally means a stray
+   transform on any device size can't force the page to scroll sideways. */
+#root {
+  overflow-x: hidden;
+  width: 100%;
+}
+
+img, video {
+  max-width: 100%;
+  height: auto;
 }
 
 /* Compact, continuously moving skills strip used above the sidebar email card. */

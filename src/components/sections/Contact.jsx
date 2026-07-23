@@ -38,11 +38,11 @@ function Contact() {
   const content = (
     <section 
   id="contact" 
-  className="relative z-20 w-full min-h-screen flex flex-col justify-center bg-[#0a0a0a] py-16 md:py-20 text-white lg:pl-72"
+  className="relative z-20 w-full min-h-screen flex flex-col justify-center bg-[#0a0a0a] py-14 sm:py-16 md:py-20 text-white lg:pl-72"
 >
-      <div className="relative mx-auto w-full max-w-[1200px] px-6 md:px-12">
+      <div className="relative mx-auto w-full max-w-[1200px] px-5 sm:px-6 md:px-12">
         
-        <div className="grid grid-cols-1 gap-12 lg:grid-cols-12 lg:gap-8 items-start">
+        <div className="grid grid-cols-1 gap-10 sm:gap-12 lg:grid-cols-12 lg:gap-8 items-start">
           
           {/* Left Column: Text & Socials */}
           <div className="flex flex-col lg:col-span-5">
@@ -50,7 +50,7 @@ function Contact() {
               <Mail size={14} strokeWidth={2.5} /> Contact
             </span>
             
-            <h2 className="font-display text-3xl font-black leading-tight tracking-tight md:text-5xl">
+            <h2 className="font-display text-3xl font-black leading-tight tracking-tight sm:text-4xl md:text-5xl">
               Let's work <br className="hidden lg:block" /> together<span className="text-[#f0ff3d]">.</span>
             </h2>
             
@@ -58,17 +58,17 @@ function Contact() {
               Feel free to reach out if you're looking for a developer, have a question, or just want to connect.
             </p>
 
-            <div className="mt-10 space-y-6">
+            <div className="mt-8 sm:mt-10 space-y-6">
               <div>
                 <span className="mb-1 block text-[10px] font-bold uppercase tracking-widest text-white/30">
                   Email
                 </span>
                 <a 
                   href="mailto:talha@example.com" 
-                  className="group inline-flex items-center gap-2 font-display text-lg font-bold text-white transition-colors hover:text-[#f0ff3d]"
+                  className="group inline-flex items-center gap-2 font-display text-base sm:text-lg font-bold text-white transition-colors hover:text-[#f0ff3d] break-all"
                 >
                   talha@example.com
-                  <ArrowUpRight size={16} className="transition-transform group-hover:translate-x-1 group-hover:-translate-y-1" />
+                  <ArrowUpRight size={16} className="shrink-0 transition-transform group-hover:translate-x-1 group-hover:-translate-y-1" />
                 </a>
               </div>
 
@@ -99,9 +99,9 @@ function Contact() {
 
           {/* Right Column: Minimalist Contact Form */}
           <div className="lg:col-span-7 lg:pl-12">
-            <form onSubmit={handleSubmit} className="flex flex-col gap-8">
+            <form onSubmit={handleSubmit} className="flex flex-col gap-6 sm:gap-8">
               
-              <div className="flex flex-col gap-2 md:flex-row md:gap-8">
+              <div className="flex flex-col gap-6 sm:gap-2 md:flex-row md:gap-8">
                 <div className="flex-1">
                   <label htmlFor="name" className="sr-only">Your Name</label>
                   <input
@@ -116,7 +116,7 @@ function Contact() {
                   />
                 </div>
 
-                <div className="flex-1 mt-6 md:mt-0">
+                <div className="flex-1 md:mt-0">
                   <label htmlFor="email" className="sr-only">Email Address</label>
                   <input
                     type="email"
