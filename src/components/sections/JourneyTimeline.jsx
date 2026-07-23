@@ -79,9 +79,22 @@ function JourneyTimeline() {
   const cardRefs = useRef([])
   const pathRef = useRef(null)
   const [mounted, setMounted] = useState(false)
+  const [isDesktop, setIsDesktop] = useState(false)
   const [line, setLine] = useState({ width: 0, height: 0, path: '', points: [] })
 
   useEffect(() => setMounted(true), [])
+
+  // The line's x-offset math differs by layout (desktop hugs alternating
+  // card edges either side of a spine; mobile/tablet runs down a single
+  // gutter since cards stack in one column) — so we need to know which
+  // layout is active and recompute when it changes (e.g. rotating a tablet).
+  useEffect(() => {
+    const mq = window.matchMedia('(min-width: 1024px)')
+    const update = () => setIsDesktop(mq.matches)
+    update()
+    mq.addEventListener('change', update)
+    return () => mq.removeEventListener('change', update)
+  }, [])
 
   useLayoutEffect(() => {
     if (!mounted) return undefined
@@ -93,10 +106,12 @@ function JourneyTimeline() {
       const sectionBox = section.getBoundingClientRect()
       const points = cardRefs.current.map((card, index) => {
         const box = card.getBoundingClientRect()
-        const side = MILESTONES[index].side
-        const x = side === 'right'
-          ? box.left - sectionBox.left - 28
-          : box.right - sectionBox.left + 28
+
+        const x = isDesktop
+          ? (MILESTONES[index].side === 'right'
+              ? box.left - sectionBox.left - 28
+              : box.right - sectionBox.left + 28)
+          : box.left - sectionBox.left - 22
 
         return {
           x,
@@ -122,7 +137,7 @@ function JourneyTimeline() {
       observer.disconnect()
       window.removeEventListener('resize', updateLine)
     }
-  }, [mounted])
+  }, [mounted, isDesktop])
 
   useLayoutEffect(() => {
     if (!line.path) return undefined
@@ -170,10 +185,10 @@ function JourneyTimeline() {
   if (!mounted) return null
 
   const content = (
-    <section id="journey" ref={sectionRef} className="relative overflow-hidden bg-background pb-24 pt-8 lg:pl-72">
+    <section id="journey" ref={sectionRef} className="relative overflow-hidden bg-background pb-24 pt-8 pl-7 sm:pl-9 lg:pl-72">
       {line.path && (
         <svg
-          className="pointer-events-none absolute inset-0 hidden lg:block"
+          className="pointer-events-none absolute inset-0"
           width={line.width}
           height={line.height}
           viewBox={`0 0 ${line.width} ${line.height}`}
@@ -200,6 +215,10 @@ function JourneyTimeline() {
                   ref={(element) => (cardRefs.current[index] = element)}
                   className="relative w-full max-w-[340px] rounded-2xl border border-white/45 bg-panel/90 p-4 shadow-[0_18px_40px_rgba(58,49,31,0.12)] backdrop-blur-sm md:p-5"
                 >
+                  {/* Desktop-only stub connecting the card to the spine line at
+                      its alternating side. Mobile/tablet cards sit in a single
+                      column against the new left-hand line, so no stub needed
+                      there — the line runs straight past the card edge. */}
                   <span className={`absolute top-14 hidden h-11 w-px bg-ink/40 lg:block ${milestone.side === 'right' ? '-left-6' : '-right-6'}`} />
                   <p className="font-display text-4xl font-black leading-none text-accent md:text-5xl">{milestone.year}</p>
                   <h3 className="mt-3 font-display text-lg font-black text-ink md:text-xl">{milestone.title}</h3>
