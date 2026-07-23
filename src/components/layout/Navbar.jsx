@@ -4,7 +4,7 @@ import { motion, AnimatePresence } from "framer-motion";
 
 function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
-  const links = ["Home", "About", "Projects", "Experience", "Services", "Contact"];
+  const links = ["Home", "About", "Skills", "Projects", "Certificates", "Contact"];
 
   const closeMenu = () => setIsOpen(false);
 
@@ -67,7 +67,7 @@ function Navbar() {
                 key={item}
                 href={`#${item.toLowerCase()}`}
                 onClick={closeMenu}
-                className="rounded-xl px-4 py-3.5 text-base md:text-lg font-semibold text-neutral-800 transition-colors hover:bg-[#f0ff3d]"
+                className="rounded-xl px-4 py-3.5 text-base md:text-lg font-semibold text-neutral-800 transition-colors hover:bg-[#f0ff3d] text-black"
               >
                 {item}
               </a>

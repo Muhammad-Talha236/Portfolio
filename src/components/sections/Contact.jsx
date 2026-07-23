@@ -2,11 +2,11 @@ import { useState, useEffect } from 'react'
 import { createPortal } from 'react-dom'
 import { Mail, Send, ArrowUpRight } from 'lucide-react'
 // Note: Agar pichli dafa 'GitHub' use kiya tha toh line 3 aur 6 mein change kar lein
-import { FaGithub, FaLinkedin, FaTwitter } from 'react-icons/fa'
+import { FaGithub, FaLinkedin,  FaInstagram  } from 'react-icons/fa'
 const SOCIAL_LINKS = [
-  { name: 'GitHub', icon: FaGithub, url: 'https://github.com/muhammad-talha236' },
-  { name: 'LinkedIn', icon: FaLinkedin, url: 'https://linkedin.com/in/your-profile' },
-  { name: 'Twitter', icon: FaTwitter, url: 'https://twitter.com/your-handle' },
+  { name: 'GitHub', icon: FaGithub, url: 'https://github.com/Muhammad-Talha236' },
+  { name: 'LinkedIn', icon: FaLinkedin, url: 'https://www.linkedin.com/in/muhammad-talha-7439122b7/' },
+  { name: 'Instagram ', icon:  FaInstagram , url: 'https://www.instagram.com/_mian.talha_/?hl=en' },
 ]
 
 function Contact() {
@@ -64,10 +64,10 @@ function Contact() {
                   Email
                 </span>
                 <a 
-                  href="mailto:talha@example.com" 
+                  href="mailto:mtalha.mt236@gmail.com" 
                   className="group inline-flex items-center gap-2 font-display text-base sm:text-lg font-bold text-white transition-colors hover:text-[#f0ff3d] break-all"
                 >
-                  talha@example.com
+                  mtalha.mt236@gmail.com
                   <ArrowUpRight size={16} className="shrink-0 transition-transform group-hover:translate-x-1 group-hover:-translate-y-1" />
                 </a>
               </div>

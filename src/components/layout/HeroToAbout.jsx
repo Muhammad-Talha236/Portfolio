@@ -4,15 +4,19 @@ import { Home, CircleUser, Briefcase, Zap, Mail, ArrowUpRight, Lightbulb, Shield
 import gsap from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
 import About from '../sections/About'
-
+import { FaGithub, FaLinkedin, FaTwitter } from 'react-icons/fa'
 gsap.registerPlugin(ScrollTrigger)
 
+const SOCIAL_LINKS = [
+  { name: 'GitHub', icon: FaGithub, url: 'https://github.com/Muhammad-Talha236' },
+  { name: 'LinkedIn', icon: FaLinkedin, url: 'https://www.linkedin.com/in/muhammad-talha-7439122b7/' },
+];
 const NAV_ITEMS = [
   { id: 'home', label: 'Home', icon: Home },
   { id: 'about', label: 'About Me', icon: CircleUser },
   { id: 'skills', label: 'Skills', icon: Target },
   { id: 'projects', label: 'Projects', icon: Briefcase },
-  { id: 'experience', label: 'Experience', icon: Zap },
+  { id: 'certificates', label: 'Certificates', icon: Zap },
   { id: 'contact', label: 'Contact', icon: Mail },
 ]
 
@@ -257,7 +261,7 @@ useLayoutEffect(() => {
         <header className="fixed inset-x-0 top-0 z-40 flex items-center justify-between px-4 py-4 sm:px-6 md:py-6 md:px-10">
           <div ref={navLogoRef} className="flex items-center gap-2">
             <span className="flex h-8 w-8 items-center justify-center rounded-full bg-accent font-display text-sm font-black text-ink">
-              T
+              MT
             </span>
             <span className="font-display text-sm font-bold text-ink">TALHA</span>
           </div>
@@ -381,10 +385,10 @@ useLayoutEffect(() => {
           </h2>
 
           <div ref={ctaBtnsRef} className="mt-6 flex w-full flex-col gap-3 xs:w-auto xs:flex-row xs:gap-4">
-            <a href="#contact" className="rounded-lg bg-accent px-7 py-3 text-center font-display font-bold text-ink shadow-md">
+            <a href="#contact" className="rounded-lg bg-accent px-7 py-3 text-center font-display font-bold text-ink shadow-md hover:scale-105 transition-transform duration-300">
               Hire Me
             </a>
-            <a href="#projects" className="rounded-lg border-2 border-ink px-7 py-3 text-center font-display font-bold text-ink">
+            <a href="#projects" className="rounded-lg border-2 border-ink px-7 py-3 text-center font-display font-bold text-ink hover:bg-ink hover:text-accent transition-colors duration-300">
               View Projects
             </a>
           </div>
@@ -399,12 +403,12 @@ useLayoutEffect(() => {
               </span>
               <div>
                 <p className="font-display text-xl font-black leading-none text-ink">10+</p>
-                <p className="text-[11px] font-semibold text-ink/60">Projects Delivered</p>
+                <p className="text-[11px] font-semibold text-ink/60">Projects Completed</p>
               </div>
             </div>
 
             <div className="flex flex-col justify-center rounded-2xl bg-panel/70 p-4 backdrop-blur-md">
-              <p className="font-display text-2xl font-black leading-none text-accent">2+</p>
+              <p className="font-display text-2xl font-black leading-none text-accent">3+</p>
               <p className="mt-1 text-[11px] font-semibold text-ink/70">Years Coding</p>
             </div>
 
@@ -437,7 +441,7 @@ useLayoutEffect(() => {
             </span>
             <div>
               <p className="font-display text-2xl font-black leading-none text-ink">10+</p>
-              <p className="text-xs font-semibold text-ink/60">Projects Delivered</p>
+              <p className="text-xs font-semibold text-ink/60">Projects Completed</p>
             </div>
           </div>
         </div>
@@ -446,7 +450,7 @@ useLayoutEffect(() => {
           ref={(el) => (statCardRefs.current[1] = el)}
           className="absolute bottom-[20%] left-[10%] z-20 hidden rounded-2xl bg-panel/70 p-4 shadow-xl backdrop-blur-md lg:block"
         >
-          <p className="font-display text-5xl font-black leading-none text-accent">2+</p>
+          <p className="font-display text-5xl font-black leading-none text-accent">3+</p>
           <p className="mt-1 text-xs font-semibold text-ink/70">Years Coding</p>
         </div>
 
@@ -493,14 +497,29 @@ useLayoutEffect(() => {
                 <div ref={sidebarLogoRef} className="w-fit rounded-md bg-accent px-2 py-1 font-display text-sm font-black tracking-tight text-ink">
                   TALHA<span className="align-super text-[10px]">®</span>
                 </div>
-                <div className="flex gap-1.5">
-                  <a aria-label="GitHub" href="https://github.com" className="rounded-md bg-cream/70 px-1.5 py-1 text-ink transition-colors hover:bg-accent">
-                    <span className="text-[10px] font-black">GH</span>
-                  </a>
-                  <a aria-label="LinkedIn" href="https://linkedin.com" className="rounded-md bg-cream/70 px-1.5 py-1 text-ink transition-colors hover:bg-accent">
-                    <span className="text-[10px] font-black">in</span>
-                  </a>
-                </div>
+               <div className="flex gap-1.5">
+  {/* GitHub */}
+  <a
+    aria-label="GitHub"
+    href="https://github.com/Muhammad-Talha236"
+    target="_blank"
+    rel="noopener noreferrer"
+    className="flex h-6 w-6 items-center justify-center rounded-md bg-cream/70 text-ink transition-all hover:bg-accent hover:scale-105"
+  >
+    <FaGithub className="h-4 w-4" />
+  </a>
+
+  {/* LinkedIn */}
+  <a
+    aria-label="LinkedIn"
+    href="https://www.linkedin.com/in/muhammad-talha-7439122b7/"
+    target="_blank"
+    rel="noopener noreferrer"
+    className="flex h-6 w-6 items-center justify-center rounded-md bg-cream/70 text-ink transition-all hover:bg-accent hover:scale-105"
+  >
+    <FaLinkedin className="h-4 w-4" />
+  </a>
+</div>
               </div>
               <p ref={sidebarTaglineRef} className="mt-3 text-[11px] leading-relaxed text-ink/80">
                 Building thoughtful, production-quality software — one project at a time.
@@ -514,7 +533,7 @@ useLayoutEffect(() => {
                 <p className="mt-1 text-[10px] font-bold leading-tight text-ink">Projects</p>
               </div>
               <div ref={(el) => (sidebarStatRefs.current[1] = el)} className="flex flex-1 flex-col items-center text-center">
-                <p className="font-display text-xl font-black leading-none text-accent">2+</p>
+                <p className="font-display text-xl font-black leading-none text-accent">3+</p>
                 <p className="mt-1 max-w-[4rem] text-[10px] font-bold leading-tight text-ink">Years of experience</p>
               </div>
             </div>
@@ -555,8 +574,8 @@ useLayoutEffect(() => {
             </div>
 
             {/* Email Contact */}
-            <a href="mailto:talha@example.com" className="flex items-center justify-between rounded-xl border border-white/35 bg-panel/80 px-3 py-2 text-[11px] text-ink/80 shadow-sm backdrop-blur-sm">
-              talha@example.com
+            <a href="mailto:mtalha.mt236@gmail.com" className="flex items-center justify-between rounded-xl border border-white/35 bg-panel/80 px-3 py-2 text-[11px] text-ink/80 shadow-sm backdrop-blur-sm">
+              mtalha.mt236@gmail.com
               <Mail size={14} strokeWidth={2.5} />
             </a>
 
