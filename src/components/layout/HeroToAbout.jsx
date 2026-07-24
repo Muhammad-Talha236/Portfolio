@@ -297,6 +297,46 @@ useLayoutEffect(() => {
     return () => mm.revert()
   }, [])
 
+
+  // Baqi sections (Skills, Projects, Certificates, Contact) ke liye active state tracker
+  useEffect(() => {
+    let observer
+    let rafId
+    const otherSectionIds = ['skills', 'projects', 'certificates', 'contact']
+
+    const trySetup = () => {
+      const els = otherSectionIds.map((id) => document.getElementById(id)).filter(Boolean)
+      
+      // Jab tak yeh saaray sections DOM mein portal ke zariye render na ho jayein, wait karein
+      if (els.length < otherSectionIds.length) {
+        rafId = requestAnimationFrame(trySetup)
+        return
+      }
+
+      observer = new IntersectionObserver(
+        (entries) => {
+          entries.forEach((entry) => {
+            if (entry.isIntersecting) {
+              setActiveSection(entry.target.id)
+              activeSectionRef.current = entry.target.id
+            }
+          })
+        },
+        // Jab section aadhi screen (center) par aaye tab highlight change ho
+        { rootMargin: '-45% 0px -45% 0px', threshold: 0 }
+      )
+
+      els.forEach((el) => observer.observe(el))
+    }
+
+    trySetup()
+
+    return () => {
+      if (rafId) cancelAnimationFrame(rafId)
+      observer?.disconnect()
+    }
+  }, [])
+
   // Skills/Projects/Contact render dark (#0a0a0a) sections; everything else
   // is light. Watch for one of those being centered in the viewport so the
   // sidebar boxes can switch to a dark-glass look instead of clashing.

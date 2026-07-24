@@ -89,7 +89,7 @@ function CertificatesShowcase() {
   if (!mounted) return null
 
   const content = (
-    <section id="credentials" className="relative z-20 w-full bg-[#ddd8cb] py-20 text-ink sm:py-24 md:py-28">
+    <section id="certificates" className="relative z-20 w-full bg-[#ddd8cb] py-20 text-ink sm:py-24 md:py-28">
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,rgba(0,0,0,0.03),transparent_60%)] pointer-events-none" />
       
       {/* FIX: lg:pl-96 se hata kar lg:pl-72 kar diya hai taake sidebar ke sath gap kam ho jaye aur content left shift ho kar adjust ho jaye */}

@@ -17,7 +17,19 @@ function Contact() {
 
   useEffect(() => {
     setMounted(true)
+    
   }, [])
+  useEffect(() => {
+    // Agar status success ya error hai, toh 4 second baad wapas idle kar do
+    if (status === 'success' || status === 'error') {
+      const timer = setTimeout(() => {
+        setStatus('idle')
+      }, 4000) // 4000 milliseconds = 4 seconds (Aap isay apni marzi se kam/zyada kar sakte hain)
+
+      // Cleanup function taake memory leak na ho
+      return () => clearTimeout(timer)
+    }
+  }, [status])
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value })
