@@ -1,4 +1,7 @@
-import { useRef, useLayoutEffect, useState } from 'react'
+
+
+
+import { useRef, useLayoutEffect, useState, useEffect } from 'react'
 import { createPortal } from 'react-dom'
 import { Home, CircleUser, Briefcase, Zap, Mail, ArrowUpRight, Lightbulb, ShieldCheck, Target, Users, Menu, X } from 'lucide-react'
 import gsap from 'gsap'
@@ -57,6 +60,46 @@ function HeroToAbout() {
   const sidebarCtaRef = useRef(null)
 
   const aboutRef = useRef(null)
+
+  // Skills/Projects/Contact render on a near-black background; every other
+  // section is the light beige theme. The sidebar is fixed and portaled
+  // outside all of them, so it needs its own signal for which zone it's
+  // currently floating over, independent of the home/about nav-highlight
+  // logic below. IntersectionObserver (rootMargin centered on the viewport)
+  // rather than scroll math keeps this decoupled from the pinned GSAP scene.
+  const [isDarkZone, setIsDarkZone] = useState(false)
+
+  useEffect(() => {
+    const darkSectionIds = ['skills', 'projects', 'contact']
+    let observer
+    // Skills/Projects/Contact are portaled by components that only mount
+    // after their own `useState(mounted)` flips on the next tick, so the
+    // elements may not exist in the DOM yet on HeroToAbout's first render.
+    const timer = setTimeout(() => {
+      const targets = darkSectionIds
+        .map((id) => document.getElementById(id))
+        .filter(Boolean)
+      if (!targets.length) return
+
+      const intersecting = new Set()
+      observer = new IntersectionObserver(
+        (entries) => {
+          entries.forEach((entry) => {
+            if (entry.isIntersecting) intersecting.add(entry.target.id)
+            else intersecting.delete(entry.target.id)
+          })
+          setIsDarkZone(intersecting.size > 0)
+        },
+        { rootMargin: '-50% 0px -50% 0px', threshold: 0 }
+      )
+      targets.forEach((el) => observer.observe(el))
+    }, 300)
+
+    return () => {
+      clearTimeout(timer)
+      observer?.disconnect()
+    }
+  }, [])
 
   // This is a pinned scroll scene, not two normal document sections. Using a
   // direct scroll target guarantees that Home reverses every tween back to 0.
@@ -252,6 +295,45 @@ useLayoutEffect(() => {
     })
 
     return () => mm.revert()
+  }, [])
+
+  // Skills/Projects/Contact render dark (#0a0a0a) sections; everything else
+  // is light. Watch for one of those being centered in the viewport so the
+  // sidebar boxes can switch to a dark-glass look instead of clashing.
+  // Those sections are portaled into <body> by their own components (each
+  // with its own one-tick-delayed mount), so we poll a couple of frames
+  // until all three ids exist before attaching the observer.
+  useLayoutEffect(() => {
+    let observer
+    let rafId
+    const darkSectionIds = ['skills', 'projects', 'contact']
+
+    const trySetup = () => {
+      const els = darkSectionIds.map((id) => document.getElementById(id)).filter(Boolean)
+      if (els.length < darkSectionIds.length) {
+        rafId = requestAnimationFrame(trySetup)
+        return
+      }
+
+      const active = new Set()
+      observer = new IntersectionObserver(
+        (entries) => {
+          entries.forEach((entry) => {
+            if (entry.isIntersecting) active.add(entry.target.id)
+            else active.delete(entry.target.id)
+          })
+          setIsDarkZone(active.size > 0)
+        },
+        { rootMargin: '-45% 0px -45% 0px', threshold: 0 }
+      )
+      els.forEach((el) => observer.observe(el))
+    }
+
+    trySetup()
+    return () => {
+      if (rafId) cancelAnimationFrame(rafId)
+      observer?.disconnect()
+    }
   }, [])
 
   return (
@@ -492,7 +574,7 @@ useLayoutEffect(() => {
           <div className="flex flex-col gap-2">
             
             {/* Logo & Tagline */}
-            <div className="rounded-xl border border-white/35 bg-panel/80 p-3 shadow-sm backdrop-blur-sm">
+            <div className={`rounded-xl border p-3 shadow-sm backdrop-blur-sm transition-colors duration-500 ${isDarkZone ? 'border-white/15 bg-white/10' : 'border-white/35 bg-panel/80'}`}>
               <div className="flex items-center justify-between">
                 <div ref={sidebarLogoRef} className="w-fit rounded-md bg-accent px-2 py-1 font-display text-sm font-black tracking-tight text-ink">
                   TALHA<span className="align-super text-[10px]">®</span>
@@ -504,7 +586,7 @@ useLayoutEffect(() => {
     href="https://github.com/Muhammad-Talha236"
     target="_blank"
     rel="noopener noreferrer"
-    className="flex h-6 w-6 items-center justify-center rounded-md bg-cream/70 text-ink transition-all hover:bg-accent hover:scale-105"
+    className={`flex h-6 w-6 items-center justify-center rounded-md transition-all hover:bg-accent hover:scale-105 ${isDarkZone ? 'bg-white/10 text-white' : 'bg-cream/70 text-ink'}`}
   >
     <FaGithub className="h-4 w-4" />
   </a>
@@ -515,31 +597,33 @@ useLayoutEffect(() => {
     href="https://www.linkedin.com/in/muhammad-talha-7439122b7/"
     target="_blank"
     rel="noopener noreferrer"
-    className="flex h-6 w-6 items-center justify-center rounded-md bg-cream/70 text-ink transition-all hover:bg-accent hover:scale-105"
+    className={`flex h-6 w-6 items-center justify-center rounded-md transition-all hover:bg-accent hover:scale-105 ${isDarkZone ? 'bg-white/10 text-white' : 'bg-cream/70 text-ink'}`}
   >
     <FaLinkedin className="h-4 w-4" />
   </a>
 </div>
               </div>
-              <p ref={sidebarTaglineRef} className="mt-3 text-[11px] leading-relaxed text-ink/80">
+              <p ref={sidebarTaglineRef} className={`mt-3 text-[11px] leading-relaxed transition-colors duration-500 ${isDarkZone ? 'text-white/70' : 'text-ink/80'}`}>
                 Building thoughtful, production-quality software — one project at a time.
               </p>
             </div>
 
             {/* Stats */}
-            <div className="flex rounded-xl border border-white/35 bg-panel/80 px-2 py-2 shadow-sm backdrop-blur-sm">
-              <div ref={(el) => (sidebarStatRefs.current[0] = el)} className="flex flex-1 flex-col items-center border-r border-ink/15 text-center">
+            <div className={`flex rounded-xl border px-2 py-2 shadow-sm backdrop-blur-sm transition-colors duration-500 ${isDarkZone ? 'border-white/15 bg-white/10' : 'border-white/35 bg-panel/80'}`}>
+              <div ref={(el) => (sidebarStatRefs.current[0] = el)} className={`flex flex-1 flex-col items-center text-center border-r ${isDarkZone ? 'border-white/15' : 'border-ink/15'}`}>
                 <p className="font-display text-xl font-black leading-none text-accent">10+</p>
-                <p className="mt-1 text-[10px] font-bold leading-tight text-ink">Projects</p>
+                <p className={`mt-1 text-[10px] font-bold leading-tight transition-colors duration-500 ${isDarkZone ? 'text-white' : 'text-ink'}`}>Projects</p>
+               <p className={`mt-1 text-[10px] font-bold leading-tight transition-colors duration-500 ${isDarkZone ? 'text-white' : 'text-ink'}`}>Completed</p>
+              
               </div>
               <div ref={(el) => (sidebarStatRefs.current[1] = el)} className="flex flex-1 flex-col items-center text-center">
                 <p className="font-display text-xl font-black leading-none text-accent">3+</p>
-                <p className="mt-1 max-w-[4rem] text-[10px] font-bold leading-tight text-ink">Years of experience</p>
+                <p className={`mt-1 max-w-[4rem] text-[10px] font-bold leading-tight transition-colors duration-500 ${isDarkZone ? 'text-white' : 'text-ink'}`}>Years of experience</p>
               </div>
             </div>
 
             {/* Navigation */}
-            <nav className="flex flex-col items-start gap-1 rounded-xl border border-white/35 bg-panel/80 p-2 shadow-sm backdrop-blur-sm">
+            <nav className={`flex flex-col items-start gap-1 rounded-xl border p-2 shadow-sm backdrop-blur-sm transition-colors duration-500 ${isDarkZone ? 'border-white/15 bg-white/10' : 'border-white/35 bg-panel/80'}`}>
               {NAV_ITEMS.map((item, i) => {
                 const Icon = item.icon
                 const isActive = activeSection === item.id
@@ -549,7 +633,9 @@ useLayoutEffect(() => {
                     ref={(el) => (sidebarLinkRefs.current[i] = el)}
                     href={`#${item.id}`}
                     onClick={(event) => handleNavigation(event, item.id)}
-                    className={`flex w-full items-center gap-2 rounded-lg px-2 py-1.5 font-display text-[11px] font-black uppercase tracking-tight text-ink transition-colors hover:bg-accent ${isActive ? 'bg-accent' : 'bg-cream/65'}`}
+                    className={`flex w-full items-center gap-2 rounded-lg px-2 py-1.5 font-display text-[11px] font-black uppercase tracking-tight transition-colors hover:bg-accent hover:text-ink ${
+                      isActive ? 'bg-accent text-ink' : isDarkZone ? 'bg-white/10 text-white' : 'bg-cream/65 text-ink'
+                    }`}
                   >
                     <Icon size={14} strokeWidth={2.75} />
                     {item.label}
@@ -563,10 +649,10 @@ useLayoutEffect(() => {
           <div className="mt-4 flex flex-col gap-2">
             
             {/* Skills Marquee */}
-            <div className="overflow-hidden rounded-xl border border-white/35 bg-panel/80 py-1.5 shadow-sm backdrop-blur-sm">
+            <div className={`overflow-hidden rounded-xl border py-1.5 shadow-sm backdrop-blur-sm transition-colors duration-500 ${isDarkZone ? 'border-white/15 bg-white/10' : 'border-white/35 bg-panel/80'}`}>
               <div className="sidebar-skill-track flex w-max items-center gap-1.5 px-2">
                 {[...SKILLS, ...SKILLS].map((skill, index) => (
-                  <span key={`${skill}-${index}`} className="rounded-md bg-cream/75 px-1.5 py-1 text-[10px] font-bold text-ink whitespace-nowrap">
+                  <span key={`${skill}-${index}`} className={`rounded-md px-1.5 py-1 text-[10px] font-bold whitespace-nowrap transition-colors duration-500 ${isDarkZone ? 'bg-white/10 text-white' : 'bg-cream/75 text-ink'}`}>
                     {skill}
                   </span>
                 ))}
@@ -574,7 +660,7 @@ useLayoutEffect(() => {
             </div>
 
             {/* Email Contact */}
-            <a href="mailto:mtalha.mt236@gmail.com" className="flex items-center justify-between rounded-xl border border-white/35 bg-panel/80 px-3 py-2 text-[11px] text-ink/80 shadow-sm backdrop-blur-sm">
+            <a href="mailto:mtalha.mt236@gmail.com" className={`flex items-center justify-between rounded-xl border px-3 py-2 text-[11px] shadow-sm backdrop-blur-sm transition-colors duration-500 ${isDarkZone ? 'border-white/15 bg-white/10 text-white/80' : 'border-white/35 bg-panel/80 text-ink/80'}`}>
               mtalha.mt236@gmail.com
               <Mail size={14} strokeWidth={2.5} />
             </a>

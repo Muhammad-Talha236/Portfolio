@@ -1,10 +1,10 @@
+
 import { useEffect, useLayoutEffect, useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
-import { ArrowUpRight, BriefcaseBusiness, GitFork, Play, Sparkles } from 'lucide-react'
+import { ArrowUpRight,BriefcaseBusiness, GitFork, Play, Sparkles } from 'lucide-react'
 import gsap from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
 import { FaGithub } from 'react-icons/fa'
-
 gsap.registerPlugin(ScrollTrigger)
 
 const PROJECTS = [
@@ -115,14 +115,14 @@ function ProjectCard({ project, index, cardRefs }) {
 
       {/* Top Content */}
       <div className="relative z-10 flex items-start justify-between gap-3">
-        <span className="rounded-full border border-white/35 bg-black/70 px-3 py-1.5 text-sm font-medium text-white">
+        <span className="rounded-full border border-white/35 bg-black/70 px-2 py-1 text-xs font-semibold text-white">
           {project.number}
         </span>
-        <div className="flex max-w-[80%] flex-wrap justify-end gap-1.5">
+        <div className="flex max-w-[80%] flex-wrap justify-end gap-1">
           {project.tags.map((tag) => (
             <span
               key={tag}
-              className="rounded-full border border-white/30 bg-black/70 px-2.5 py-1.5 text-xs font-semibold text-white"
+              className="rounded-full border border-white/30 bg-black/70 px-2 py-1 text-xs font-semibold text-white"
             >
               {tag}
             </span>
@@ -138,10 +138,10 @@ function ProjectCard({ project, index, cardRefs }) {
       {/* Bottom Content */}
       <div className="relative z-10 mt-auto flex items-end justify-between gap-4">
         <div className="min-w-0 flex-1">
-          <h3 className="font-display text-2xl sm:text-1xl font-black leading-tight tracking-tight text-white md:text-1xl">
+          <h3 className="font-display text-xl sm:text-1xl font-black leading-tight tracking-tight text-white md:text-1xl">
             {project.title}
           </h3>
-          <p className="mt-2 text-sm leading-relaxed text-white/80 line-clamp-3 md:text-base">
+          <p className="mt-2 text-xs leading-relaxed text-white/80 line-clamp-3 md:text-sm">
             {project.description}
           </p>
         </div>
@@ -160,6 +160,7 @@ function ProjectCard({ project, index, cardRefs }) {
     </article>
   )
 }
+
 function ProjectsShowcase() {
   const sectionRef = useRef(null)
   const railRef = useRef(null)
@@ -223,15 +224,14 @@ function ProjectsShowcase() {
       ref={sectionRef}
       className="relative overflow-hidden bg-[#171717] py-16 text-white lg:min-h-[100svh] lg:py-0"
     >
-      <div className="pointer-events-none absolute inset-0 bg-gradient-to-b from-[#0d0d0d] via-[#171717] to-[#222222]" />
-
+    <div className="pointer-events-none absolute inset-0 bg-gradient-to-b from-[#0d0d0d] via-[#171717] to-[#222222]" />
       {/* FIX 2: lg:h-screen aur strict grid-rows hata diye gaye hain, lg:py-16 add kiya hai taake naturally flow kare */}
       <div className="relative flex min-h-full flex-col justify-center lg:py-16">
         
         <header className="mx-auto flex w-full flex-col gap-6 px-6 pb-8 md:px-10 lg:mx-0 lg:max-w-none lg:flex-row lg:items-end lg:justify-between lg:pl-[280px] lg:pr-16 lg:pt-6 lg:pb-5">
           <div>
             <span className="inline-flex items-center gap-2 rounded-full border border-white/25 px-3 py-1.5 text-xs font-black uppercase tracking-[0.14em] text-white/80"><BriefcaseBusiness size={14} className="text-accent" /> Selected work</span>
-            <h2 className="mt-5 max-w-3xl font-display text-4xl sm:text-5xl font-black leading-[0.95] tracking-tight md:text-6xl md:leading-[0.9]">Made to perform<span className="text-accent">!</span></h2>
+            <h2 className="mt-5 max-w-3xl font-display text-4xl sm:text-5xl font-black leading-[0.95] tracking-tight md:text-6xl md:leading-[0.9]">Made to perform<span className="text-accent">.</span></h2>
           </div>
           <p className="max-w-sm text-sm leading-relaxed text-white/62 md:text-base lg:text-lg">A few digital experiences built with a focus on clear thinking, visual craft, and a little motion where it matters.</p>
         </header>
@@ -259,7 +259,7 @@ function ProjectsShowcase() {
               {/* Card Content (z-10 zaroori hai taake yeh image ke oopar rahay) */}
               <div className="relative z-10 flex flex-col items-center">
                 <div className="mb-2 flex h-16 w-16 items-center justify-center rounded-full bg-white/10 text-accent">
-                  <GitFork size={32} strokeWidth={2.5} />
+                  <FaGithub size={32} strokeWidth={2.5} />
                 </div>
                 <h3 className="font-display text-2xl font-black text-white">More on GitHub</h3>
                 <p className="mt-3 text-sm leading-relaxed text-white/70">

@@ -1,5 +1,7 @@
+import { ArrowBigDown, ArrowBigDownDash, ArrowBigDownDashIcon } from 'lucide-react'
 import { useState, useEffect } from 'react'
 import { createPortal } from 'react-dom'
+import { LuArrowBigDownDash } from 'react-icons/lu'
 
 const IMAGES = [
   'https://images.unsplash.com/photo-1550745165-9bc0b252726f?auto=format&fit=crop&w=800&q=80',
@@ -98,8 +100,8 @@ function NameRevealShowcase() {
             &reg;
           </div>
         </div>
-        <p className="mt-12 text-xs font-mono font-bold uppercase tracking-[0.3em] text-black/50 text-center">
-          Hover directly over each letter to reveal its unique image mask
+        <p className="mt-12 text-lg font-mono font-bold uppercase tracking-[0.3em] text-black/50 text-center">
+          Let's build something amazing! <ArrowBigDown size={22} className="inline-block ml-1 animate-bounce duration-75 text-black/50" />
         </p>
       </div>
     </section>

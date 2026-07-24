@@ -91,7 +91,7 @@ function Contact() {
             </span>
             
             <h2 className="font-display text-3xl font-black leading-tight tracking-tight sm:text-4xl md:text-5xl">
-              Let's work <br className="hidden lg:block" /> together<span className="text-[#f0ff3d]">.</span>
+              Let's work <br className="hidden lg:block" /> together<span className="text-[#f0ff3d]"> !</span>
             </h2>
             
             <p className="mt-4 max-w-sm text-sm leading-relaxed text-white/50">
