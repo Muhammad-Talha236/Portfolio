@@ -21,7 +21,7 @@ const About = forwardRef(function About(_, ref) {
           <br></br> My Journey
         </h2>
         <p className="mt-4 max-w-md text-sm text-ink/70 sm:text-base md:text-1xl">
-          Two years ago I opened VS Code for the first time. What happened after
+          Three years ago I opened VS Code for the first time. What happened after
           that is easier to show than explain.
         </p>
       </section>

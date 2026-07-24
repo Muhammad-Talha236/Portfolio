@@ -236,7 +236,10 @@ function JourneyTimeline() {
                       </span>
                     </div>
                     <button className="inline-flex shrink-0 items-center gap-1 rounded-xl border border-ink/10 bg-cream/80 px-2.5 py-1.5 text-[11px] font-semibold text-ink transition-colors hover:bg-accent">
-                      Read more <ArrowUpRight size={15} strokeWidth={2.5} />
+                      <a href="https://github.com/Muhammad-Talha236" target="_blank" rel="noreferrer" className="flex items-center gap-1">
+                        Profile
+                        <ArrowUpRight size={15} strokeWidth={2.5} />
+                      </a>
                     </button>
                   </footer>
                 </article>
