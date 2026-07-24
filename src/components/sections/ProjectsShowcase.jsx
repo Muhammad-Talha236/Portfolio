@@ -101,7 +101,7 @@ function ProjectCard({ project, index, cardRefs }) {
         cardRefs.current[index] = element
       }}
       // WIDTH aur HEIGHT adjust kardi gayi hain taake content bahar na jaye
-      className={`project-card project-card--${project.tone} group relative flex h-[560px] sm:h-[580px] w-[min(82vw,420px)] shrink-0 flex-col overflow-hidden rounded-[1.5rem] border border-white/10 p-5 md:p-6 snap-center`}
+      className={`project-card project-card--${project.tone} group relative flex h-[500px] sm:h-[570px] w-[min(82vw,420px)] shrink-0 flex-col overflow-hidden rounded-[1.5rem] border border-white/10 p-5 md:p-6 snap-center`}
     >
       {/* Background Image */}
       <div
@@ -244,7 +244,7 @@ function ProjectsShowcase() {
           {/* =========================================
                 Final GitHub CTA Card (With Background Image)
                 ========================================= */}
-            <div className="group relative flex h-[560px] sm:h-[580px] w-[min(82vw,360px)] shrink-0 snap-center flex-col items-center justify-center overflow-hidden rounded-[1.5rem] border border-white/10 p-6 sm:p-8 text-center transition-colors hover:border-white/20">
+            <div className="group relative flex h-[500px] sm:h-[570px] w-[min(82vw,360px)] shrink-0 snap-center flex-col items-center justify-center overflow-hidden rounded-[1.5rem] border border-white/10 p-6 sm:p-8 text-center transition-colors hover:border-white/20">
               
               {/* Background Image (Is url mein aap apni image ka link daal sakte hain) */}
               <div 
