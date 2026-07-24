@@ -21,7 +21,7 @@ const PROJECTS = [
 },
  
  {
-  number: '03',
+  number: '02',
   title: 'Core Banking System',
   description: 'A secure banking platform designed to manage customer accounts, transactions, and essential banking operations.',
   tags: ['React', 'Node.js', 'Express', 'MongoDB'],
@@ -36,7 +36,7 @@ const PROJECTS = [
   title: 'SplitNest',
   description: 'A smart expense-splitting platform designed to make shared expenses simple, transparent, and easy to manage.',
   tags: ['React', 'Node.js', 'Express', 'MongoDB'],
-  device: '',
+  device: 'tablet',
   github: 'https://github.com/Muhammad-Talha236/Split_Nest',
   video: '/videos/splitnest.mp4',
   poster: '/images/paisa.jpg',
