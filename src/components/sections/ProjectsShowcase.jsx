@@ -1,8 +1,9 @@
 import { useEffect, useLayoutEffect, useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
-import { BriefcaseBusiness, GitFork, Play, Sparkles } from 'lucide-react'
+import { ArrowUpRight, BriefcaseBusiness, GitFork, Play, Sparkles } from 'lucide-react'
 import gsap from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
+import { FaGithub } from 'react-icons/fa'
 
 gsap.registerPlugin(ScrollTrigger)
 
@@ -12,7 +13,7 @@ const PROJECTS = [
   title: 'Eventra',
   description: 'A full-stack event management platform designed to simplify event registration, scheduling, payments, and event operations.',
   tags: ['React', 'Node.js', 'Express', 'MongoDB'],
-  device: 'laptop',
+  device: 'tablet',
   github: 'https://github.com/Muhammad-Talha236/Eventra_',
   video: '/videos/eventra.mp4',
   poster: '/images/sports.jpg',
@@ -24,7 +25,7 @@ const PROJECTS = [
   title: 'Core Banking System',
   description: 'A secure banking platform designed to manage customer accounts, transactions, and essential banking operations.',
   tags: ['React', 'Node.js', 'Express', 'MongoDB'],
-  device: 'laptop',
+  device: 'tablet',
   github: 'https://github.com/Muhammad-Talha236/Core_Bank_System',
   video: '/videos/corebanking.mp4',
   poster: '/images/corebank.jpg',
@@ -35,7 +36,7 @@ const PROJECTS = [
   title: 'SplitNest',
   description: 'A smart expense-splitting platform designed to make shared expenses simple, transparent, and easy to manage.',
   tags: ['React', 'Node.js', 'Express', 'MongoDB'],
-  device: 'laptop',
+  device: '',
   github: 'https://github.com/Muhammad-Talha236/Split_Nest',
   video: '/videos/splitnest.mp4',
   poster: '/images/paisa.jpg',
@@ -57,7 +58,7 @@ const PROJECTS = [
   title: 'Weather App',
   description: 'A clean and responsive weather application providing real-time weather conditions and forecasts for any location.',
   tags: ['React', 'JavaScript', 'Weather API'],
-  device: 'laptop',
+  device: 'tablet',
   github: 'https://github.com/Muhammad-Talha236/weather_app',
   video: '/videos/wea.mp4',
   poster: '/images/wea.png',
@@ -101,7 +102,7 @@ function ProjectCard({ project, index, cardRefs }) {
         cardRefs.current[index] = element
       }}
       // WIDTH aur HEIGHT adjust kardi gayi hain taake content bahar na jaye
-      className={`project-card project-card--${project.tone} group relative flex h-[500px] sm:h-[570px] w-[min(82vw,420px)] shrink-0 flex-col overflow-hidden rounded-[1.5rem] border border-white/10 p-5 md:p-6 snap-center`}
+      className={`project-card project-card--${project.tone} group relative flex h-[450px] sm:h-[500px] w-[min(82vw,350px)] shrink-0 flex-col overflow-hidden rounded-[1rem] border border-white/10 p-5 md:p-6 snap-center`}
     >
       {/* Background Image */}
       <div
@@ -117,7 +118,7 @@ function ProjectCard({ project, index, cardRefs }) {
         <span className="rounded-full border border-white/35 bg-black/70 px-3 py-1.5 text-sm font-medium text-white">
           {project.number}
         </span>
-        <div className="flex max-w-[72%] flex-wrap justify-end gap-1.5">
+        <div className="flex max-w-[80%] flex-wrap justify-end gap-1.5">
           {project.tags.map((tag) => (
             <span
               key={tag}
@@ -130,14 +131,14 @@ function ProjectCard({ project, index, cardRefs }) {
       </div>
 
       {/* Device Preview */}
-      <div className="relative z-10 flex flex-1 items-center justify-center px-3 py-5">
+      <div className="relative z-10 flex flex-1 items-center justify-center px-2 py-2">
         <DevicePreview project={project} />
       </div>
 
       {/* Bottom Content */}
       <div className="relative z-10 mt-auto flex items-end justify-between gap-4">
         <div className="min-w-0 flex-1">
-          <h3 className="font-display text-2xl sm:text-3xl font-black leading-tight tracking-tight text-white md:text-4xl">
+          <h3 className="font-display text-2xl sm:text-1xl font-black leading-tight tracking-tight text-white md:text-1xl">
             {project.title}
           </h3>
           <p className="mt-2 text-sm leading-relaxed text-white/80 line-clamp-3 md:text-base">
@@ -150,10 +151,10 @@ function ProjectCard({ project, index, cardRefs }) {
           target="_blank"
           rel="noreferrer"
           aria-label={`View ${project.title} source on GitHub`}
-          className="relative z-30 inline-flex shrink-0 items-center gap-2 rounded-full bg-accent px-4 py-3 text-sm font-black text-ink transition-all duration-300 hover:-translate-y-1 hover:scale-105"
+          className="relative z-20 inline-flex shrink-0 items-center gap-1 rounded-full bg-accent px-4 py-3 text-sm font-black text-ink transition-all duration-300 hover:-translate-y-1 hover:scale-105"
         >
-          <GitFork size={17} strokeWidth={2.5} />
-          <span className="hidden xs:inline">GitHub</span>
+          <FaGithub size={18} strokeWidth={2.5} />
+           <ArrowUpRight size={16} strokeWidth={2.5} />
         </a>
       </div>
     </article>
@@ -220,9 +221,9 @@ function ProjectsShowcase() {
     <section
       id="projects"
       ref={sectionRef}
-      className="relative overflow-hidden bg-[#0a0a0a] py-16 text-white lg:min-h-[100svh] lg:py-0"
+      className="relative overflow-hidden bg-[#171717] py-16 text-white lg:min-h-[100svh] lg:py-0"
     >
-      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_42%_20%,rgba(240,255,61,0.1),transparent_26%),linear-gradient(180deg,#080808_0%,#151515_100%)]" />
+      <div className="pointer-events-none absolute inset-0 bg-gradient-to-b from-[#0d0d0d] via-[#171717] to-[#222222]" />
 
       {/* FIX 2: lg:h-screen aur strict grid-rows hata diye gaye hain, lg:py-16 add kiya hai taake naturally flow kare */}
       <div className="relative flex min-h-full flex-col justify-center lg:py-16">
@@ -230,7 +231,7 @@ function ProjectsShowcase() {
         <header className="mx-auto flex w-full flex-col gap-6 px-6 pb-8 md:px-10 lg:mx-0 lg:max-w-none lg:flex-row lg:items-end lg:justify-between lg:pl-[280px] lg:pr-16 lg:pt-6 lg:pb-5">
           <div>
             <span className="inline-flex items-center gap-2 rounded-full border border-white/25 px-3 py-1.5 text-xs font-black uppercase tracking-[0.14em] text-white/80"><BriefcaseBusiness size={14} className="text-accent" /> Selected work</span>
-            <h2 className="mt-5 max-w-3xl font-display text-4xl sm:text-5xl font-black leading-[0.95] tracking-tight md:text-6xl md:leading-[0.9]">Made to perform<span className="text-accent">.</span></h2>
+            <h2 className="mt-5 max-w-3xl font-display text-4xl sm:text-5xl font-black leading-[0.95] tracking-tight md:text-6xl md:leading-[0.9]">Made to perform<span className="text-accent">!</span></h2>
           </div>
           <p className="max-w-sm text-sm leading-relaxed text-white/62 md:text-base lg:text-lg">A few digital experiences built with a focus on clear thinking, visual craft, and a little motion where it matters.</p>
         </header>
@@ -244,7 +245,7 @@ function ProjectsShowcase() {
           {/* =========================================
                 Final GitHub CTA Card (With Background Image)
                 ========================================= */}
-            <div className="group relative flex h-[500px] sm:h-[570px] w-[min(82vw,360px)] shrink-0 snap-center flex-col items-center justify-center overflow-hidden rounded-[1.5rem] border border-white/10 p-6 sm:p-8 text-center transition-colors hover:border-white/20">
+            <div className="group relative flex h-[450px] sm:h-[500px] w-[min(82vw,350px)] shrink-0 snap-center flex-col items-center justify-center overflow-hidden rounded-[1.5rem] border border-white/10 p-6 sm:p-8 text-center transition-colors hover:border-white/20">
               
               {/* Background Image (Is url mein aap apni image ka link daal sakte hain) */}
               <div 
@@ -270,7 +271,7 @@ function ProjectsShowcase() {
                   rel="noreferrer"
                   className="mt-8 inline-flex items-center gap-2 rounded-full bg-accent px-6 py-3 text-sm font-black text-ink transition-transform hover:scale-105"
                 >
-                  <GitFork size={18} strokeWidth={2.5} />
+                  <FaGithub size={18} strokeWidth={2.5} />
                   <span>View All Projects</span>
                 </a>
               </div>

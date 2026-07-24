@@ -3,7 +3,9 @@ import { createPortal } from 'react-dom'
 import { Code2, Database, WandSparkles, Sparkles, Cpu } from 'lucide-react'
 import gsap from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
-
+import { FaGithub, FaLinkedin, FaInstagram } from 'react-icons/fa'
+const SOCIAL_LINKS = [{ name: 'GitHub', icon: FaGithub, url: 'https://github.com/Muhammad-Talha236' }];
+ 
 gsap.registerPlugin(ScrollTrigger)
 
 const EXPERTISE_CARDS = [
@@ -96,9 +98,9 @@ function SkillsShowcase() {
       id="skills" 
       ref={sectionRef} 
       // Section ki length ko cards ke hisaab se set kiya hai
-      className="relative h-[300vh] bg-[#0a0a0a] text-white lg:pl-64"
+      className="relative h-[300vh] bg-[#0e0e0e] text-white lg:pl-64"
     >
-      {/* Sticky Container taake section screen par pin rahay */}
+      {/* Sticky Container taake section scree;n par pin rahay */}
       <div className="sticky top-0 flex h-screen w-full flex-col items-center justify-center overflow-hidden px-6">
         
         {/* Background Ambient Glow */}
