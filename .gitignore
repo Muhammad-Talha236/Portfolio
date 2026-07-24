@@ -12,6 +12,12 @@ dist
 dist-ssr
 *.local
 
+# Env files — contains the real Web3Forms access key, keep it out of git.
+# .env.example (committed) shows what's needed without the real value.
+.env
+.env.*
+!.env.example
+
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json

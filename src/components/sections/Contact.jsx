@@ -1,18 +1,19 @@
 import { useState, useEffect } from 'react'
 import { createPortal } from 'react-dom'
 import { Mail, Send, ArrowUpRight } from 'lucide-react'
-// Note: Agar pichli dafa 'GitHub' use kiya tha toh line 3 aur 6 mein change kar lein
-import { FaGithub, FaLinkedin,  FaInstagram  } from 'react-icons/fa'
+import { FaGithub, FaLinkedin, FaInstagram } from 'react-icons/fa'
 const SOCIAL_LINKS = [
   { name: 'GitHub', icon: FaGithub, url: 'https://github.com/Muhammad-Talha236' },
   { name: 'LinkedIn', icon: FaLinkedin, url: 'https://www.linkedin.com/in/muhammad-talha-7439122b7/' },
-  { name: 'Instagram ', icon:  FaInstagram , url: 'https://www.instagram.com/_mian.talha_/?hl=en' },
+  { name: 'Instagram', icon: FaInstagram, url: 'https://www.instagram.com/_mian.talha_/?hl=en' },
 ]
 
 function Contact() {
   const [mounted, setMounted] = useState(false)
   const [formData, setFormData] = useState({ name: '', email: '', message: '' })
   const [isSubmitting, setIsSubmitting] = useState(false)
+  // 'idle' | 'success' | 'error' — drives the inline status message under the button
+  const [status, setStatus] = useState('idle')
 
   useEffect(() => {
     setMounted(true)
@@ -20,17 +21,56 @@ function Contact() {
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value })
+    if (status !== 'idle') setStatus('idle')
   }
 
   const handleSubmit = async (e) => {
     e.preventDefault()
+
+    // Honeypot: a hidden field only bots fill in. If it has a value, silently
+    // pretend to succeed instead of actually sending — cheap spam filter that
+    // needs no backend.
+    if (e.target.elements.botcheck?.value) return
+
     setIsSubmitting(true)
-    
-    setTimeout(() => {
-      alert('Message sent successfully! 🚀')
+    setStatus('idle')
+
+    try {
+      const accessKey = import.meta.env.VITE_WEB3FORMS_ACCESS_KEY
+
+      if (!accessKey) {
+        // Fails loudly in dev/build instead of silently pretending to work —
+        // see the setup note in the README for how to get a key.
+        throw new Error('Missing VITE_WEB3FORMS_ACCESS_KEY')
+      }
+
+      const response = await fetch('https://api.web3forms.com/submit', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
+        body: JSON.stringify({
+          access_key: accessKey,
+          subject: `New portfolio message from ${formData.name}`,
+          from_name: formData.name,
+          name: formData.name,
+          email: formData.email,
+          message: formData.message,
+        }),
+      })
+
+      const result = await response.json()
+
+      if (result.success) {
+        setStatus('success')
+        setFormData({ name: '', email: '', message: '' })
+      } else {
+        throw new Error(result.message || 'Something went wrong')
+      }
+    } catch (error) {
+      console.error('Contact form submit failed:', error)
+      setStatus('error')
+    } finally {
       setIsSubmitting(false)
-      setFormData({ name: '', email: '', message: '' })
-    }, 1500)
+    }
   }
 
   if (!mounted) return null
@@ -100,7 +140,17 @@ function Contact() {
           {/* Right Column: Minimalist Contact Form */}
           <div className="lg:col-span-7 lg:pl-12">
             <form onSubmit={handleSubmit} className="flex flex-col gap-6 sm:gap-8">
-              
+              {/* Honeypot — real users never see or fill this (off-screen, no
+                  label), spam bots that auto-fill every input do. */}
+              <input
+                type="text"
+                name="botcheck"
+                tabIndex={-1}
+                autoComplete="off"
+                className="absolute left-[-9999px] h-px w-px opacity-0"
+                aria-hidden="true"
+              />
+
               <div className="flex flex-col gap-6 sm:gap-2 md:flex-row md:gap-8">
                 <div className="flex-1">
                   <label htmlFor="name" className="sr-only">Your Name</label>
@@ -145,7 +195,7 @@ function Contact() {
                 />
               </div>
 
-              <div className="mt-2 flex justify-start">
+              <div className="mt-2 flex flex-col items-start gap-3">
                 <button
                   type="submit"
                   disabled={isSubmitting}
@@ -154,6 +204,20 @@ function Contact() {
                   {isSubmitting ? 'Sending...' : 'Send Message'}
                   {!isSubmitting && <Send size={14} strokeWidth={3} className="transition-transform group-hover:translate-x-1 group-hover:-translate-y-1" />}
                 </button>
+
+                {status === 'success' && (
+                  <p className="text-sm font-semibold text-[#8fe36a]" role="status">
+                    Thanks — your message is on its way. I'll get back to you soon.
+                  </p>
+                )}
+                {status === 'error' && (
+                  <p className="text-sm font-semibold text-red-400" role="alert">
+                    Couldn't send that — please try again, or email me directly at{' '}
+                    <a href="mailto:mtalha.mt236@gmail.com" className="underline underline-offset-2">
+                      mtalha.mt236@gmail.com
+                    </a>.
+                  </p>
+                )}
               </div>
             </form>
           </div>
