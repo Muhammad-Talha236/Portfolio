@@ -122,6 +122,18 @@ function Contact() {
                   mtalha.mt236@gmail.com
                   <ArrowUpRight size={16} className="shrink-0 transition-transform group-hover:translate-x-1 group-hover:-translate-y-1" />
                 </a>
+            
+                 <span className="mb-1 mt-1 block text-[10px] font-bold uppercase tracking-widest text-white/30">
+                  Phone
+                </span>
+                <a 
+                  href="tel:+923299922005" 
+                  className="group inline-flex items-center gap-2 font-display text-base sm:text-lg font-bold text-white transition-colors hover:text-[#f0ff3d] break-all"
+                >
+                  +92 329 992 2005
+                  <ArrowUpRight size={16} className="shrink-0 transition-transform group-hover:translate-x-1 group-hover:-translate-y-1" />
+                </a>
+
               </div>
 
               <div>
