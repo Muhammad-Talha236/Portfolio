@@ -168,7 +168,7 @@ function JourneyTimeline() {
           {
             autoAlpha: 1,
             y: 0,
-            duration: 6,
+            duration: 3,
             ease: 'power3.out',
             scrollTrigger: {
               trigger: card,
