@@ -1,4 +1,3 @@
-
 import { useEffect, useLayoutEffect, useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
 import { ArrowUpRight,BriefcaseBusiness, GitFork, Play, Sparkles } from 'lucide-react'
@@ -15,8 +14,8 @@ const PROJECTS = [
   tags: ['React', 'Node.js', 'Express', 'MongoDB'],
   device: 'tablet',
   github: 'https://github.com/Muhammad-Talha236/Eventra_',
-  video: '/videos/eventra.mp4',
-  poster: '/images/sports.jpg',
+  video: '/videos/eventra.webm',
+  poster: '/images/sports.webp',
   tone: 'violet',
 },
  
@@ -27,8 +26,8 @@ const PROJECTS = [
   tags: ['React', 'Node.js', 'Express', 'MongoDB'],
   device: 'tablet',
   github: 'https://github.com/Muhammad-Talha236/Core_Bank_System',
-  video: '/videos/corebanking.mp4',
-  poster: '/images/corebank.jpg',
+  video: '/videos/corebanking.webm',
+  poster: '/images/corebank.webp',
   tone: 'blue',
 },
  {
@@ -38,8 +37,8 @@ const PROJECTS = [
   tags: ['React', 'Node.js', 'Express', 'MongoDB'],
   device: 'tablet',
   github: 'https://github.com/Muhammad-Talha236/Split_Nest',
-  video: '/videos/splitnest.mp4',
-  poster: '/images/paisa.jpg',
+  video: '/videos/splitnest.webm',
+  poster: '/images/paisa.webp',
   tone: 'blue',
 },
  {
@@ -49,8 +48,8 @@ const PROJECTS = [
   tags: ['React', 'Node.js', 'Express', 'PostgreSQL'],
   device: 'mobile',
   github: 'https://github.com/Muhammad-Talha236/ERP',
-  video: '/videos/eerp.mp4',
-  poster: '/images/erp.jpg',
+  video: '/videos/eerp.webm',
+  poster: '/images/erp.webp',
   tone: 'green',
 },
   {
@@ -60,13 +59,13 @@ const PROJECTS = [
   tags: ['React', 'JavaScript', 'Weather API'],
   device: 'tablet',
   github: 'https://github.com/Muhammad-Talha236/weather_app',
-  video: '/videos/wea.mp4',
-  poster: '/images/wea.png',
+  video: '/videos/wea.webm',
+  poster: '/images/wea.webp',
   tone: 'cyan',
 }
 ]
 
-function DevicePreview({ project }) {
+function DevicePreview({ project, videoRef }) {
   return (
     <div className={`project-device project-device--${project.device}`}>
       <div className="project-device__topbar">
@@ -74,7 +73,7 @@ function DevicePreview({ project }) {
       </div>
       <div className="project-device__screen">
         <video
-          autoPlay
+          ref={videoRef}
           muted
           loop
           playsInline
@@ -96,11 +95,29 @@ function DevicePreview({ project }) {
 }
 
 function ProjectCard({ project, index, cardRefs }) {
+  const videoRef = useRef(null)
+
+  const playVideo = () => {
+    videoRef.current?.play().catch(() => {})
+  }
+
+  const pauseVideo = () => {
+    const video = videoRef.current
+    if (!video) return
+    video.pause()
+    video.currentTime = 0 // next hover starts fresh from the beginning
+  }
+
   return (
     <article
       ref={(element) => {
         cardRefs.current[index] = element
       }}
+      onMouseEnter={playVideo}
+      onMouseLeave={pauseVideo}
+      // Touch devices don't really have "hover" — tapping the card plays the
+      // preview instead, and it pauses again once you scroll it out of view.
+      onTouchStart={playVideo}
       // WIDTH aur HEIGHT adjust kardi gayi hain taake content bahar na jaye
       className={`project-card project-card--${project.tone} group relative flex h-[450px] sm:h-[500px] w-[min(82vw,350px)] shrink-0 flex-col overflow-hidden rounded-[1rem] border border-white/10 p-5 md:p-6 snap-center`}
     >
@@ -132,7 +149,7 @@ function ProjectCard({ project, index, cardRefs }) {
 
       {/* Device Preview */}
       <div className="relative z-10 flex flex-1 items-center justify-center px-2 py-2">
-        <DevicePreview project={project} />
+        <DevicePreview project={project} videoRef={videoRef} />
       </div>
 
       {/* Bottom Content */}
