@@ -57,13 +57,23 @@ function SkillsShowcase() {
       const cards = cardRefs.current
       if (!cards.length) return
 
+      // The section is h-[300vh], but the sticky wrapper is only h-screen
+      // (100vh) tall — `position: sticky` only stays pinned for
+      // (containerHeight - stickyHeight) = 300vh - 100vh = 200vh of scroll.
+      // After that the container itself ends and the sticky content starts
+      // scrolling away normally, revealing Projects underneath. All 4 cards'
+      // animations need to finish exactly at that 200vh mark — using the
+      // full 300vh here (my earlier fix) meant the last card was still mid-
+      // animation when the section had already started unsticking, which is
+      // exactly the "4th card not centered, Projects bleeding through" bug.
+      const sliceHeight = () => (window.innerHeight * 2) / cards.length
+
       cards.forEach((card, i) => {
         const tl = gsap.timeline({
           scrollTrigger: {
             trigger: sectionRef.current,
-            // Har card ke liye scroll distance barha di hai taake smooth scrubbing ho
-            start: `top+=${i * 300} top`,
-            end: `top+=${(i + 1) * 300} top`,
+            start: () => `top+=${i * sliceHeight()} top`,
+            end: () => `top+=${(i + 1) * sliceHeight()} top`,
             scrub: true, // Direct mouse scroll control
             invalidateOnRefresh: true,
           }
@@ -103,9 +113,6 @@ function SkillsShowcase() {
       {/* Sticky Container taake section scree;n par pin rahay */}
       <div className="sticky top-0 flex h-screen w-full flex-col items-center justify-center overflow-hidden px-6">
         
-        {/* Background Ambient Glow */}
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 h-[500px] w-[500px] rounded-full bg-accent/5 blur-[140px] pointer-events-none" />
-
         {/* TOP CENTER FIXED HEADER (Overlap fix karne ke liye margin/spacing de di hai) */}
         <div className="absolute top-8 left-1/2 -translate-x-1/2 text-center z-20">
           <span className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/5 px-3.5 py-1 text-[11px] font-black uppercase tracking-widest text-accent backdrop-blur-md">
@@ -124,7 +131,7 @@ function SkillsShowcase() {
               <div
                 key={card.id}
                 ref={(el) => (cardRefs.current[index] = el)}
-                className="absolute inset-0 rounded-3xl border border-white/15 bg-neutral-900/90 p-6 md:p-7 backdrop-blur-2xl shadow-[0_20px_60px_rgba(0,0,0,0.7)] flex flex-col justify-between"
+                className="absolute inset-0 rounded-3xl border border-white/15 bg-neutral-900/95 p-6 md:p-7 shadow-[0_10px_30px_rgba(0,0,0,0.5)] flex flex-col justify-between"
               >
                 <div>
                   <div className="flex items-center justify-between mb-4">
